@@ -1,6 +1,79 @@
 <%- include('partials/header.ejs'); -%>
 
+<div class="input-block">
+    <input type="text" id="name-input" placeholder="Enter your name">
+    <button id="name-send">
+        Enter your name
+    </button>
+
+    <input type="text" id="oponent-input" placeholder="Enter your oponent">
+    <input type="text" id="character-input" placeholder="Enter your oponents character">
+
+    <button id="character-send">
+        Add character
+    </button>
+</div>  
+<pre id="messages"></pre>
 
 
+<script>
+
+    
+    const nameInput = document.getElementById('name-input');
+    const nameSend = document.getElementById('name-send');
+
+    const oponentNameInput = document.getElementById('oponent-input');
+    const characterInput = document.getElementById('character-input');
+
+    const characterSend = document.getElementById('character-send');
+
+    const messages = document.getElementById('messages');
+
+    const ws = new WebSocket('ws://localhost:3000');
+
+    var playerName = "";
+    var oponentNames = [];
+
+    nameSend.addEventListener('click', () => {
+        playerName = nameInput?.value
+    }); 
+
+    characterSend.addEventListener('click', () => {
+        const val = {
+            oponentName: oponentNameInput?.value,
+            character: characterInput?.value,
+        };
+        oponentNames.push(oponentNameInput?.value)
+
+        if (!val) {
+            return;
+        } else if (!ws) {
+            showMessage('No WebSocket connection');
+            return;
+        }
+
+        ws.send(JSON.stringify(val));
+        nameInput.value = '';
+        messages.textContent += `\n${val.oponentName} - ${val.character}`;
+        console.log("clicked");
+    }); 
+
+    ws.onmessage = (event) => {
+        console.log("broadcast received");
+        var object = JSON.parse(event.data);
+        if(playerName == object.oponentName){
+            messages.textContent += `\n${object.oponentName} - ???????`;
+        } else{
+            messages.textContent += `\n${object.oponentName} - ${object.character}`;
+            oponentNames.push(object.oponentName)
+        }
+        console.log(oponentNames);
+        console.log(playerName);
+    };
+
+    function showMessage(message) {
+        messages.textContent += `\n${message}`;
+    }
+</script>
 
 <%- include('partials/footer.ejs'); -%>
