@@ -1,10 +1,6 @@
 <%- include('partials/header.ejs'); -%>
 
 <div class="input-block">
-    <input type="text" id="name-input" placeholder="Enter your name">
-    <button id="name-send">
-        Enter your name
-    </button>
 
     <input type="text" id="oponent-input" placeholder="Enter your oponent">
     <input type="text" id="character-input" placeholder="Enter your oponents character">
@@ -18,10 +14,6 @@
 
 <script>
 
-    
-    const nameInput = document.getElementById('name-input');
-    const nameSend = document.getElementById('name-send');
-
     const oponentNameInput = document.getElementById('oponent-input');
     const characterInput = document.getElementById('character-input');
 
@@ -33,10 +25,9 @@
 
     var playerName = "";
     var oponentNames = [];
+    var messagesCount = 0;
 
-    nameSend.addEventListener('click', () => {
-        playerName = nameInput?.value
-    }); 
+    
 
     characterSend.addEventListener('click', () => {
         const val = {
@@ -61,7 +52,11 @@
     ws.onmessage = (event) => {
         console.log("broadcast received");
         var object = JSON.parse(event.data);
-        if(playerName == object.oponentName){
+        if(messagesCount === 0){
+            playerName =  JSON.parse(event.data);
+            messagesCount++;
+            console.log(playerName);
+        } else if(playerName == object.oponentName){
             messages.textContent += `\n${object.oponentName} - ???????`;
         } else{
             messages.textContent += `\n${object.oponentName} - ${object.character}`;

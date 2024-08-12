@@ -1,0 +1,12 @@
+<%- include('partials/header.ejs'); -%>
+
+<form id="name-form" action="/submit-name" method="POST">
+    <div class="input-block">
+        <input type="text" id="name-input" name="name" placeholder="Enter your name" required>
+        <button type="submit" id="name-send">
+            Enter your name
+        </button>
+    </div>  
+</form>
+
+<%- include('partials/footer.ejs'); -%>
