@@ -5,9 +5,13 @@ import path from 'path';
 import ejs from 'ejs';
 import bodyParser from 'body-parser';
 
+
 // Create the Express app and HTTP server
 const app = express();
 const server = createServer(app);
+
+app.use(express.static(path.join(path.resolve(), 'public')));
+
 
 // Set up the WebSocket server
 const wss = new WebSocketServer({ server });
