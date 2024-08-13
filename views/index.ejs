@@ -34,6 +34,12 @@
             oponentName: oponentNameInput?.value,
             character: characterInput?.value,
         };
+
+        const form = document.querySelector('.input-block');
+        if (form) {
+            form.style.display = 'none';
+        }
+
         oponentNames.push(oponentNameInput?.value)
 
         if (!val) {
@@ -45,26 +51,42 @@
 
         ws.send(JSON.stringify(val));
         nameInput.value = '';
-        messages.textContent += `\n${val.oponentName} - ${val.character}`;
+        createMessageDiv(val.oponentName, val.character);
         console.log("clicked");
     }); 
 
     ws.onmessage = (event) => {
-        console.log("broadcast received");
+        console.log("Broadcast received");
         var object = JSON.parse(event.data);
-        if(messagesCount === 0){
-            playerName =  JSON.parse(event.data);
+
+        // Check if the player is the same as the current player or another player
+        if (messagesCount === 0) {
+            playerName = object.oponentName;
             messagesCount++;
             console.log(playerName);
-        } else if(playerName == object.oponentName){
-            messages.textContent += `\n${object.oponentName} - ???????`;
-        } else{
-            messages.textContent += `\n${object.oponentName} - ${object.character}`;
-            oponentNames.push(object.oponentName)
+        } else if (playerName === object.oponentName) {
+            createMessageDiv(object.oponentName, "???????");
+        } else {
+            createMessageDiv(object.oponentName, object.character);
+            oponentNames.push(object.oponentName);
         }
         console.log(oponentNames);
         console.log(playerName);
     };
+
+    function createMessageDiv(oponentName, character) {
+    // Create a new div element
+    const messageDiv = document.createElement('div');
+
+    // Set the content of the div
+    messageDiv.textContent = `${oponentName} - ${character}`;
+
+    // Optionally, add a class for styling
+    messageDiv.classList.add('message');
+
+    // Append the new div to the messages container
+    messages.appendChild(messageDiv);
+}
 
     function showMessage(message) {
         messages.textContent += `\n${message}`;
