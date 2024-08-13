@@ -46,7 +46,7 @@
   
   /* Button styling */
   button[type="submit"],
-  button#character-send {
+  .button {
     width: 100%;
     padding: 12px 15px;
     background-color: #007bff;
@@ -59,12 +59,12 @@
   }
   
   button[type="submit"]:hover,
-  button#character-send:hover {
+  .button:hover {
     background-color: #0056b3;
   }
 /* Container for the message divs */
 #messages {
-    display: flex;
+    display: none; /*this display will change to flex when some1 hits the start button*/
     flex-wrap: wrap; /* Allows wrapping to a new line if there's not enough space */
     gap: 15px; /* Defines the gap between the message divs */
     margin-top: 15px;
@@ -104,3 +104,7 @@
     text-decoration: underline;
   }
   
+  #start-game {
+    display: none;
+    max-width: 150px;
+  }

@@ -5,10 +5,15 @@
     <input type="text" id="oponent-input" placeholder="Enter your oponent">
     <input type="text" id="character-input" placeholder="Enter your oponents character">
 
-    <button id="character-send">
+    <button id="character-send" class="button">
         Add character
     </button>
 </div>  
+
+<button id="start-game" class="button">
+    Start Game
+</button>
+
 <pre id="messages"></pre>
 
 
@@ -18,8 +23,10 @@
     const characterInput = document.getElementById('character-input');
 
     const characterSend = document.getElementById('character-send');
+    const startGame = document.getElementById('start-game')
 
     const messages = document.getElementById('messages');
+
 
     const ws = new WebSocket('ws://localhost:3000');
 
@@ -27,7 +34,13 @@
     var oponentNames = [];
     var messagesCount = 0;
 
-    
+    startGame.addEventListener('click', () => {
+        startGame.style.display = 'none';
+        messages.style.display = 'flex';
+
+        // broadcast the start of the game
+        ws.send(JSON.stringify("start-game"));
+    });
 
     characterSend.addEventListener('click', () => {
         const val = {
@@ -39,6 +52,9 @@
         if (form) {
             form.style.display = 'none';
         }
+        console.log("co jest kurwa")
+        startGame.style.display = 'block';
+        console.log("co jest kurwa2")
 
         oponentNames.push(oponentNameInput?.value)
 
@@ -58,14 +74,21 @@
     ws.onmessage = (event) => {
         console.log("Broadcast received");
         var object = JSON.parse(event.data);
+        console.log(`obiekt = ${object}`);
 
         // Check if the player is the same as the current player or another player
+        console.log(messagesCount);
+        // If this is the first message, insert the name into playerName
         if (messagesCount === 0) {
-            playerName = object.oponentName;
+            playerName = object;
             messagesCount++;
             console.log(playerName);
         } else if (playerName === object.oponentName) {
+            console.log(`watttt ${object.oponentName}`);
             createMessageDiv(object.oponentName, "???????");
+        } else if (object === 'start-game'){
+            startGame.style.display = 'none';
+            messages.style.display = 'flex';
         } else {
             createMessageDiv(object.oponentName, object.character);
             oponentNames.push(object.oponentName);
