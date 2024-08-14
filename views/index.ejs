@@ -2,8 +2,21 @@
 
 <div class="input-block">
 
+
+    <!-- <input type="text" list="opponents" id="opponent-input" placeholder="Enter your opponent">
+    <datalist id="opponents">
+        <option value="Donald Trump">
+        <option value="Drake">
+        <option value="LeBron James">
+        <option value="Taylor Swift">
+        <option value="Lionel Messi">
+    </datalist> -->
     <input type="text" id="oponent-input" placeholder="Enter your oponent">
+
+
     <input type="text" id="character-input" placeholder="Enter your oponents character">
+
+    
 
     <button id="character-send" class="button">
         Add character
@@ -20,6 +33,8 @@
 <script>
 
     const oponentNameInput = document.getElementById('oponent-input');
+    // const opponentsList = document.getElementById('opponents'); do oponentów 
+
     const characterInput = document.getElementById('character-input');
 
     const characterSend = document.getElementById('character-send');
@@ -83,6 +98,8 @@
             playerName = object;
             messagesCount++;
             console.log(playerName);
+            // createOptionElement(playerName); do oponentów 
+
         } else if (playerName === object.oponentName) {
             console.log(`watttt ${object.oponentName}`);
             createMessageDiv(object.oponentName, "???????");
@@ -98,18 +115,25 @@
     };
 
     function createMessageDiv(oponentName, character) {
-    // Create a new div element
-    const messageDiv = document.createElement('div');
+        // Create a new div element
+        const messageDiv = document.createElement('div');
 
-    // Set the content of the div
-    messageDiv.textContent = `${oponentName} - ${character}`;
+        // Set the content of the div
+        messageDiv.textContent = `${oponentName} - ${character}`;
 
-    // Optionally, add a class for styling
-    messageDiv.classList.add('message');
+        // Optionally, add a class for styling
+        messageDiv.classList.add('message');
 
-    // Append the new div to the messages container
-    messages.appendChild(messageDiv);
-}
+        // Append the new div to the messages container
+        messages.appendChild(messageDiv);
+    }
+
+    function createOptionElement(oponentName){
+        const option = document.createElement('option')
+
+        option.value = `${oponentName}`
+        opponentsList.appendChild(option);
+    }
 
     function showMessage(message) {
         messages.textContent += `\n${message}`;
