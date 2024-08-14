@@ -3,15 +3,12 @@
 <div class="input-block">
 
 
-    <!-- <input type="text" list="opponents" id="opponent-input" placeholder="Enter your opponent">
+    <input type="text" list="opponents" id="opponent-input" placeholder="Enter your opponent">
+    
     <datalist id="opponents">
-        <option value="Donald Trump">
-        <option value="Drake">
-        <option value="LeBron James">
-        <option value="Taylor Swift">
-        <option value="Lionel Messi">
-    </datalist> -->
-    <input type="text" id="oponent-input" placeholder="Enter your oponent">
+
+    </datalist>
+    <!-- <input type="text" id="oponent-input" placeholder="Enter your oponent"> -->
 
 
     <input type="text" id="character-input" placeholder="Enter your oponents character">
@@ -32,8 +29,8 @@
 
 <script>
 
-    const oponentNameInput = document.getElementById('oponent-input');
-    // const opponentsList = document.getElementById('opponents'); do oponentów 
+    const oponentNameInput = document.getElementById('opponent-input');
+    const opponentsList = document.getElementById('opponents');
 
     const characterInput = document.getElementById('character-input');
 
@@ -98,8 +95,6 @@
             playerName = object;
             messagesCount++;
             console.log(playerName);
-            // createOptionElement(playerName); do oponentów 
-
         } else if (playerName === object.oponentName) {
             console.log(`watttt ${object.oponentName}`);
             createMessageDiv(object.oponentName, "???????");

@@ -27,8 +27,17 @@ app.use(bodyParser.urlencoded({ extended: true }));
 var name = "";
 
 wss.on('connection', function connection(ws) {
+
   ws.send(JSON.stringify(name));
+  //send everyone newly connected player his name
+  // wss.clients.forEach(function each(client) {
+  //   if (client.readyState === ws.OPEN) {
+  //     ws.send(JSON.stringify("name-broadcast")); //info that this message is a name broadcast
+  //     ws.send(JSON.stringify(name));
+  //   }
+  // });
   console.log('A new client Connected!');
+
   ws.on('message', function message(data) {
     console.log(`received message : ${data}`);
 
