@@ -1,12 +1,41 @@
 <%- include('partials/header.ejs'); -%>
 
 <form id="name-form" action="/submit-name" method="POST">
-    <div class="input-block">
+    <div class="input-block" id="create/join-buttons">
         <input type="text" id="name-input" name="name" placeholder="Enter your name" required>
-        <button type="submit" id="name-send">
-            Enter your name
-        </button>
-    </div>  
+        
+    <!-- Wrap buttons in a container for flex layout -->
+        <div class="buttons-container">
+            <button type="submit" id="create-room" name="action" value="create">
+                Create Room
+            </button>
+            <button type="submit" id="join-room">
+                Join Room
+            </button>
+        </div>
+    </div>
+
+    <div class="input-block" id="join-room-block" style="display: none;">
+        <input type="text" id="room-input" name="room" placeholder="Enter room code" >
+
+        <div class="buttons-container">
+            <button type="submit" id="join-room-after-code" name="action" value="join" style="width: 100%;">
+                Join Room
+            </button>
+        </div>
+    </div>
 </form>
+
+<script>
+    const inputBlock = document.getElementById("create/join-buttons");
+    const joinRoom = document.getElementById("join-room-block");
+    document.getElementById('join-room').addEventListener('click', function(event) {
+        event.preventDefault();
+        console.log('Join Room button clicked');
+        inputBlock.style.display = "none";
+        joinRoom.style.display = "flex";
+        document.getElementById('room-input').setAttribute('required', 'required');
+    });
+</script>
 
 <%- include('partials/footer.ejs'); -%>
