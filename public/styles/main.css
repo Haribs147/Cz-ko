@@ -119,3 +119,20 @@
     display: none;
     max-width: 150px;
   }
+
+  #room {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-top: 20px;
+    text-align: center; /* Center the text inside the p element */
+}
+
+#room-code {
+    background-color: #007bff; /* Background color for the room code */
+    color: #fff; /* Text color for the room code */
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 18px; /* Font size for the room code */
+    font-weight: bold;
+}
