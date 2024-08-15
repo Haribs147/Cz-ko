@@ -45,11 +45,12 @@
     var playerName = '<=% name %>';
     var oponentNames = [];
     var messagesCount = 0;
-
+    var roomCode = "";
     ws.onopen = () => {
         playerName = "<%= name %>";  // The name is passed from the server-side EJS rendering
+        roomCode = "<%= code %>"
         console.log(`IMIEEEEEEE ${playerName}`)
-        ws.send(JSON.stringify({type: 'name', name: playerName }));
+        ws.send(JSON.stringify({roomCode: roomCode, type: 'name', name: playerName }));
     };
 
     startGame.addEventListener('click', () => {
@@ -57,13 +58,14 @@
         messages.style.display = 'flex';
 
         // broadcast the start of the game
-        ws.send(JSON.stringify({type: 'start-game'}));
+        ws.send(JSON.stringify({roomCode: roomCode, type: 'start-game'}));
     });
 
     characterSend.addEventListener('click', () => {
         const val = {
             oponentName: oponentNameInput?.value,
             character: characterInput?.value,
+            roomCode: roomCode,
         };
 
         const form = document.querySelector('.input-block');
@@ -96,15 +98,15 @@
         //     messagesCount++;
         //     console.log(playerName);
         // } else 
-        if (playerName === object.oponentName) {
+        if (playerName === object.oponentName && roomCode === object.roomCode) {
             console.log(`watttt ${object.oponentName}`);
             createMessageDiv(object.oponentName, "???????");
-        } else if (object.type === 'start-game'){
+        } else if (object.type === 'start-game' && roomCode === object.roomCode){
             startGame.style.display = 'none';
             messages.style.display = 'flex';
-        } else if(object.type === 'name'){
+        } else if (object.type === 'name' && roomCode === object.roomCode){
             createOptionElement(object.name)
-        } else {
+        } else if (roomCode === object.roomCode){
             createMessageDiv(object.oponentName, object.character);
             oponentNames.push(object.oponentName);
         }
