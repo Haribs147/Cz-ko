@@ -40,7 +40,7 @@
     const messages = document.getElementById('messages');
 
 
-    const ws = new WebSocket('wss://heads-up-poui.onrender.com'); //ws://localhost:3000
+    const ws = new WebSocket('ws://localhost:3000'); //wss://heads-up-poui.onrender.com
 
     var playerName = '<=% name %>';
     var oponentNames = [];
@@ -49,7 +49,7 @@
     ws.onopen = () => {
         playerName = "<%= name %>";  // The name is passed from the server-side EJS rendering
         console.log(`IMIEEEEEEE ${playerName}`)
-        // ws.send(JSON.stringify({ playerName }));
+        ws.send(JSON.stringify({type: 'name', name: playerName }));
     };
 
     startGame.addEventListener('click', () => {
@@ -57,7 +57,7 @@
         messages.style.display = 'flex';
 
         // broadcast the start of the game
-        ws.send(JSON.stringify("start-game"));
+        ws.send(JSON.stringify({type: 'start-game'}));
     });
 
     characterSend.addEventListener('click', () => {
@@ -70,21 +70,15 @@
         if (form) {
             form.style.display = 'none';
         }
-        console.log("co jest kurwa")
         startGame.style.display = 'block';
-        console.log("co jest kurwa2")
 
         oponentNames.push(oponentNameInput?.value)
 
         if (!val) {
-            console.log("cos zjebane w if(!val)");
             return;
         } else if (!ws) {
-            showMessage('No WebSocket connection');
             return;
         }
-
-        console.log("clicked");
         ws.send(JSON.stringify(val));
         createMessageDiv(val.oponentName, val.character);
     }); 
@@ -105,9 +99,11 @@
         if (playerName === object.oponentName) {
             console.log(`watttt ${object.oponentName}`);
             createMessageDiv(object.oponentName, "???????");
-        } else if (object === 'start-game'){
+        } else if (object.type === 'start-game'){
             startGame.style.display = 'none';
             messages.style.display = 'flex';
+        } else if(object.type === 'name'){
+            createOptionElement(object.name)
         } else {
             createMessageDiv(object.oponentName, object.character);
             oponentNames.push(object.oponentName);
