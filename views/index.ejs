@@ -19,7 +19,7 @@
         Add character
     </button>
 </div>  
-
+<p id="room"> room :</p>
 <button id="start-game" class="button">
     Start Game
 </button>
@@ -39,6 +39,7 @@
 
     const messages = document.getElementById('messages');
 
+    const roomParagraph = document.getElementById('room');
 
     const ws = new WebSocket('ws://localhost:3000'); //wss://heads-up-poui.onrender.com
 
@@ -49,6 +50,7 @@
     ws.onopen = () => {
         playerName = "<%= name %>";  // The name is passed from the server-side EJS rendering
         roomCode = "<%= code %>"
+        roomParagraph.innerHTML=roomCode;
         console.log(`IMIEEEEEEE ${playerName}`)
         ws.send(JSON.stringify({roomCode: roomCode, type: 'name', name: playerName }));
     };
