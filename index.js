@@ -41,8 +41,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 async function setupDatabase() {
   try {
-    // Connect to the database
-    await db.connect();
 
     // SQL commands to create tables
     const createTablesQuery = `
