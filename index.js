@@ -42,7 +42,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 async function setupDatabase() {
   try {
     // Connect to the database
-    await client.connect();
+    await db.connect();
 
     // SQL commands to create tables
     const createTablesQuery = `
@@ -60,7 +60,7 @@ async function setupDatabase() {
     `;
 
     // Execute the SQL commands
-    await client.query(createTablesQuery);
+    await db.query(createTablesQuery);
 
     console.log('Database setup complete.');
 
@@ -68,7 +68,6 @@ async function setupDatabase() {
     console.error('Error setting up the database:', err);
   } finally {
     // Close the connection
-    await client.end();
   }
 }
 
