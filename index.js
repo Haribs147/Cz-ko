@@ -38,6 +38,43 @@ app.set('views', path.join(path.resolve(), 'views'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+
+async function setupDatabase() {
+  try {
+    // Connect to the database
+    await client.connect();
+
+    // SQL commands to create tables
+    const createTablesQuery = `
+      CREATE TABLE IF NOT EXISTS game_room (
+        ID SERIAL PRIMARY KEY,
+        code VARCHAR(10) UNIQUE NOT NULL,
+        host_id INT
+      );
+
+      CREATE TABLE IF NOT EXISTS players (
+        ID SERIAL PRIMARY KEY,
+        name VARCHAR(15) NOT NULL,
+        room_id INT REFERENCES game_room(ID)
+      );
+    `;
+
+    // Execute the SQL commands
+    await client.query(createTablesQuery);
+
+    console.log('Database setup complete.');
+
+  } catch (err) {
+    console.error('Error setting up the database:', err);
+  } finally {
+    // Close the connection
+    await client.end();
+  }
+}
+
+// Run the setup function
+setupDatabase();
+
 wss.on('connection', function connection(ws) {
   console.log('A new client Connected!');
 
