@@ -40,11 +40,17 @@
     const messages = document.getElementById('messages');
 
 
-    const ws = new WebSocket('wss://heads-up-poui.onrender.com');
+    const ws = new WebSocket('wss://heads-up-poui.onrender.com'); //ws://localhost:3000
 
-    var playerName = "";
+    var playerName = '<=% name %>';
     var oponentNames = [];
     var messagesCount = 0;
+
+    ws.onopen = () => {
+        playerName = "<%= name %>";  // The name is passed from the server-side EJS rendering
+        console.log(`IMIEEEEEEE ${playerName}`)
+        // ws.send(JSON.stringify({ playerName }));
+    };
 
     startGame.addEventListener('click', () => {
         startGame.style.display = 'none';
@@ -71,16 +77,16 @@
         oponentNames.push(oponentNameInput?.value)
 
         if (!val) {
+            console.log("cos zjebane w if(!val)");
             return;
         } else if (!ws) {
             showMessage('No WebSocket connection');
             return;
         }
 
-        ws.send(JSON.stringify(val));
-        nameInput.value = '';
-        createMessageDiv(val.oponentName, val.character);
         console.log("clicked");
+        ws.send(JSON.stringify(val));
+        createMessageDiv(val.oponentName, val.character);
     }); 
 
     ws.onmessage = (event) => {
@@ -91,11 +97,12 @@
         // Check if the player is the same as the current player or another player
         console.log(messagesCount);
         // If this is the first message, insert the name into playerName
-        if (messagesCount === 0) {
-            playerName = object;
-            messagesCount++;
-            console.log(playerName);
-        } else if (playerName === object.oponentName) {
+        // if (messagesCount === 0) {
+        //     playerName = object;
+        //     messagesCount++;
+        //     console.log(playerName);
+        // } else 
+        if (playerName === object.oponentName) {
             console.log(`watttt ${object.oponentName}`);
             createMessageDiv(object.oponentName, "???????");
         } else if (object === 'start-game'){
@@ -121,6 +128,7 @@
 
         // Append the new div to the messages container
         messages.appendChild(messageDiv);
+        console.log(`dodaje do diva ${oponentName} - ${character}`);
     }
 
     function createOptionElement(oponentName){
