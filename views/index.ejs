@@ -105,19 +105,23 @@
         //     messagesCount++;
         //     console.log(playerName);
         // } else 
-        if (playerName === object.oponentName && roomCode === object.roomCode) {
-            console.log(`watttt ${object.oponentName}`);
-            createMessageDiv(object.oponentName, "???????");
-        } else if (object.type === 'start-game' && roomCode === object.roomCode){
-            startGame.style.display = 'none';
-            messages.style.display = 'flex';
-            document.getElementById('room').style.display = 'none';
-        } else if (object.type === 'name' && roomCode === object.roomCode){
-            createOptionElement(object.name)
-        } else if (roomCode === object.roomCode){
-            createMessageDiv(object.oponentName, object.character);
-            oponentNames.push(object.oponentName);
+
+        if(roomCode === object.roomCode){
+            if (playerName === object.oponentName) {
+                console.log(`watttt ${object.oponentName}`);
+                createMessageDiv(object.oponentName, "???????");
+            } else if (object.type === 'start-game'){
+                startGame.style.display = 'none';
+                messages.style.display = 'flex';
+                document.getElementById('room').style.display = 'none';
+            } else if (object.type === 'name'){
+                createOptionElement(object.name)
+            } else{
+                createMessageDiv(object.oponentName, object.character);
+                oponentNames.push(object.oponentName);
+            }
         }
+        
         console.log(oponentNames);
         console.log(playerName);
     };
