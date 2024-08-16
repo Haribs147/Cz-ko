@@ -75,6 +75,9 @@ setupDatabase();
 wss.on('connection', function connection(ws) {
   console.log('A new client Connected!');
 
+  
+
+
   ws.on('message', function message(data) {
     console.log(`received message: ${data}`);
 

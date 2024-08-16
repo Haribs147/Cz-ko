@@ -57,7 +57,7 @@
         roomCode = "<%= code %>"
         roomParagraph.textContent = roomCode;
         console.log(`IMIEEEEEEE ${playerName}`)
-        ws.send(JSON.stringify({roomCode: roomCode, type: 'name', name: playerName }));
+        ws.send(JSON.stringify({roomCode: roomCode, type: 'name', name: playerName })); //wysyłam całą tablicę osób, jakie są w grze i jeżeli czyDostalem = 0 to biorę całą tablice i tworze forem, a jeżeli czyDostalem = 1 to biorę ostatni indeks tablicy i dodaję
     };
 
     startGame.addEventListener('click', () => {
