@@ -19,14 +19,18 @@
         Add character
     </button>
 </div>  
+<div class="flex-col-container">
+    <button id="start-game" class="button">
+        Start Game
+    </button>
 
-<button id="start-game" class="button">
-    Start Game
-</button>
+    <p id="room">Room Code: <span id="room-code"><%= code %></span></p>
+</div>
+
 
 <pre id="messages"></pre>
 
-<p id="room">Room Code: <span id="room-code"><%= code %></span></p>
+
 
 <script>
 
@@ -42,7 +46,7 @@
 
     const roomParagraph = document.getElementById('room-code');
 
-    const ws = new WebSocket('wss://heads-up-1.onrender.com'); //ws://localhost:3000
+    const ws = new WebSocket('ws://localhost:3000'); //wss://heads-up-1.onrender.com
 
     var playerName = '<=% name %>';
     var oponentNames = [];
