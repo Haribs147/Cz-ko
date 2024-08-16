@@ -63,7 +63,7 @@
     startGame.addEventListener('click', () => {
         startGame.style.display = 'none';
         messages.style.display = 'flex';
-
+        document.getElementById('room').style.display = 'none';
         // broadcast the start of the game
         ws.send(JSON.stringify({roomCode: roomCode, type: 'start-game'}));
     });
@@ -111,6 +111,7 @@
         } else if (object.type === 'start-game' && roomCode === object.roomCode){
             startGame.style.display = 'none';
             messages.style.display = 'flex';
+            document.getElementById('room').style.display = 'none';
         } else if (object.type === 'name' && roomCode === object.roomCode){
             createOptionElement(object.name)
         } else if (roomCode === object.roomCode){
