@@ -20,6 +20,7 @@
     </button>
 </div>  
 <div class="flex-col-container">
+    <p id="start-game-message" style="display: none;">Wait for host to start the game</p>
     <button id="start-game" class="button">
         Start Game
     </button>
@@ -81,9 +82,11 @@
         if (form) {
             form.style.display = 'none';
         }
-        console.log(isHost);
+        
         if(isHost == 1){
             startGame.style.display = 'block';
+        } else {
+            document.getElementById('start-game-message').style.display = 'block';
         }
 
         if (!val) {
@@ -129,6 +132,7 @@
                 startGame.style.display = 'none';
                 messages.style.display = 'flex';
                 document.getElementById('room').style.display = 'none'; 
+                document.getElementById('start-game-message').style.display = 'none';
             } else{
                 createMessageDiv(object.oponentName, object.character);
             }
