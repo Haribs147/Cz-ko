@@ -51,9 +51,11 @@
     var playerName = '<=% name %>';
     var messagesCount = 0;
     var roomCode = "";  
+    var isHost = 0;
     ws.onopen = () => {
         playerName = "<%= name %>";  // The name is passed from the server-side EJS rendering
         roomCode = "<%= code %>"
+        isHost = "<%= isHost %>";
         roomParagraph.textContent = roomCode;
         console.log(`IMIEEEEEEE ${playerName}`)
         //save the player name into allNames
@@ -79,9 +81,10 @@
         if (form) {
             form.style.display = 'none';
         }
-        startGame.style.display = 'block';
-
-        
+        console.log(isHost);
+        if(isHost == 1){
+            startGame.style.display = 'block';
+        }
 
         if (!val) {
             return;
@@ -116,7 +119,7 @@
                         if(allNames[i] != playerName){
                             createOptionElement(allNames[i]);
                         }
-                        
+
                     }
                     messagesCount++;
                 } else{

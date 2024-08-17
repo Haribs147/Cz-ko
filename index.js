@@ -151,7 +151,7 @@ app.post('/submit-name', async (req, res) => {
           [name, roomId]
         );
 
-        res.render('index', { name: name, code: generatedCode });
+        res.render('index', { name: name, code: generatedCode, isHost: 1 });
       } catch (err) {
         console.log(err);
         res.status(500).json({ message: 'An error occurred while creating the room.' });
@@ -173,7 +173,7 @@ app.post('/submit-name', async (req, res) => {
             "INSERT INTO players (name, room_id) VALUES ($1, $2)",
             [name, roomId]
           );
-          res.render('index', { name: name, code: code });
+          res.render('index', { name: name, code: code, isHost: 0 });
         } else {
           res.status(404).json({ message: 'Room not found.' });
         }
