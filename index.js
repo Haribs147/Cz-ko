@@ -2,7 +2,7 @@ import express from 'express';
 import { createServer } from 'http';
 import { WebSocketServer } from 'ws';
 import path from 'path';
-import ejs from 'ejs';
+import ejs, { name } from 'ejs';
 import bodyParser from 'body-parser';
 import pg from 'pg';
 import { randomBytes } from 'crypto';
@@ -72,21 +72,57 @@ async function setupDatabase() {
 // Run the setup function
 setupDatabase();
 
-wss.on('connection', function connection(ws) {
+wss.on('connection',async function connection(ws) {
   console.log('A new client Connected!');
 
   
 
 
-  ws.on('message', function message(data) {
+  ws.on('message', async function message(data) {
     console.log(`received message: ${data}`);
 
-    wss.clients.forEach(function each(client) {
-      if (client !== ws && client.readyState === ws.OPEN) {
-        // Ensure that data is a string
-        client.send(JSON.stringify(JSON.parse(data)));
+    const message = JSON.parse(data);
+
+    if(message.type === 'name'){
+
+      try {
+
+        // Get names from the db
+        const result = await db.query(
+          "SELECT players.name FROM players JOIN game_room ON players.room_id = game_room.ID WHERE game_room.code = $1"
+          , [message.roomCode]);
+
+        const sendNames = {
+          type: 'name',
+          allNames: result.rows,
+          roomCode: message.roomCode,
+        };
+        console.log(sendNames);
+        // Send all of the players names back
+        wss.clients.forEach(function each(client) {
+          if (client.readyState === ws.OPEN) {
+            // Ensure that data is a string
+            client.send(JSON.stringify(sendNames));
+          }
+        });
+
+      } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: 'An error occurred while getting the names of the players' });
       }
-    });
+
+    } else{
+
+      wss.clients.forEach(function each(client) {
+        if (client !== ws && client.readyState === ws.OPEN) {
+          // Ensure that data is a string
+          client.send(JSON.stringify(message));
+        }
+      });
+
+    }
+    
+
   });
 });
 
