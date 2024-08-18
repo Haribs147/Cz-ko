@@ -47,11 +47,11 @@
 
     const roomParagraph = document.getElementById('room-code');
 
-    const ws = new WebSocket('wss://heads-up-1.onrender.com'); //ws://localhost:3000
+    const ws = new WebSocket('ws://localhost:3000'); //wss://heads-up-1.onrender.com
 
-    var playerName = '<=% name %>';
+    var playerName;
     var messagesCount = 0;
-    var roomCode = "";  
+    var roomCode;  
     var isHost = 0;
     ws.onopen = () => {
         playerName = "<%= name %>";  // The name is passed from the server-side EJS rendering
