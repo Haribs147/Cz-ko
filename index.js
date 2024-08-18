@@ -53,6 +53,7 @@ async function setupDatabase() {
       CREATE TABLE IF NOT EXISTS players (
         ID SERIAL PRIMARY KEY,
         name VARCHAR(15) NOT NULL,
+        isReady INT,
         room_id INT REFERENCES game_room(ID)
       );
     `;
@@ -83,13 +84,40 @@ wss.on('connection',async function connection(ws) {
 
     const message = JSON.parse(data);
 
+    if(message.type === 'characterSend'){
+      
+      try {
+
+        // update the ready status of the player
+        const playerName = message.playerName;
+        const roomCode = message.roomCode;
+
+        // Update the ready status of the player in the specified room
+        await db.query(
+          `UPDATE players 
+           SET isReady = 1 
+           FROM game_room 
+           WHERE players.room_id = game_room.ID 
+           AND players.name = $1 
+           AND game_room.code = $2;`,
+          [playerName, roomCode]
+        );
+
+        console.log(`Player ${playerName} in room ${roomCode} is now ready.`);
+
+      } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: 'An error occurred while updating the status of a player' });
+      }
+    }
+
     if(message.type === 'name'){
 
       try {
 
         // Get names from the db
         const result = await db.query(
-          "SELECT players.name FROM players JOIN game_room ON players.room_id = game_room.ID WHERE game_room.code = $1"
+          "SELECT players.name, players.isready FROM players JOIN game_room ON players.room_id = game_room.ID WHERE game_room.code = $1"
           , [message.roomCode]);
 
         const sendNames = {

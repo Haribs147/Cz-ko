@@ -82,6 +82,7 @@
             character: characterInput?.value,
             roomCode: roomCode,
             playerName: playerName,
+            type: 'characterSend',
         };
 
         const form = document.querySelector('.input-block');
@@ -119,16 +120,24 @@
                 playerReady(object.playerName);
             } else if (object.type === 'name'){
                 
-                // Extracting all the names from the map into an array `allNames`
+                // Extracting all the names from the map into an array `allNames` and their status into different array
                 const allNames = object.allNames.map(obj => obj.name);
+                const allIsReady = object.allNames.map(obj => obj.isready);
 
                 console.log(`ALL NAMES od 0 : ${allNames[0]}`);
+                console.log(`ALL ISREADY od 0 : ${allIsReady[0]}`);
+
                 if(messagesCount === 0){
                     for( let i = 0; i < allNames.length; i++ ){
 
                         if(allNames[i] != playerName){
                             createOptionElement(allNames[i]);
                             createPlayerCircle(allNames[i]);
+
+                            // if the player was ready change the circle color to green
+                            if(allIsReady[i] === 1){
+                                playerReady(allNames[i]);
+                            }
                         }
 
                     }
