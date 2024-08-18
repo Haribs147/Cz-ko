@@ -81,6 +81,7 @@
             oponentName: oponentNameInput?.value,
             character: characterInput?.value,
             roomCode: roomCode,
+            playerName: playerName,
         };
 
         const form = document.querySelector('.input-block');
@@ -115,6 +116,7 @@
             if (playerName === object.oponentName) {
                 console.log(`watttt ${object.oponentName}`);
                 createMessageDiv(object.oponentName, "???????");
+                playerReady(object.playerName);
             } else if (object.type === 'name'){
                 
                 // Extracting all the names from the map into an array `allNames`
@@ -141,7 +143,9 @@
                 document.getElementById('room').style.display = 'none'; 
                 document.getElementById('start-game-message').style.display = 'none';
             } else{
+                console.log(`O CO CHODZIIIIIIIIIIII ${object.playerName}`)
                 createMessageDiv(object.oponentName, object.character);
+                playerReady(object.playerName);
             }
         }
         
@@ -178,8 +182,15 @@
         const circleDiv = document.createElement('div');
 
         circleDiv.className = 'circle';
+        circleDiv.id = name;
         circleDiv.textContent = name[0].toUpperCase();
         players.appendChild(circleDiv);
+    }
+
+    function playerReady( name ){
+        console.log(`o CO CHODZI ${name}`)
+        const player = document.getElementById(name); 
+        player.style.border = '3px solid #28A745';
     }
 
 </script>
