@@ -141,3 +141,16 @@
   align-items: center;
   flex-direction: column;
 }
+
+.circle {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #FF4C4C ; /* #28A745 */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
