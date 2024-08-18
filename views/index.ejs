@@ -58,6 +58,9 @@
     var messagesCount = 0;
     var roomCode;  
     var isHost = 0;
+
+    var val;
+
     ws.onopen = () => {
         playerName = "<%= name %>";  // The name is passed from the server-side EJS rendering
         roomCode = "<%= code %>"
@@ -71,19 +74,26 @@
     startGame.addEventListener('click', () => {
         startGame.style.display = 'none';
         messages.style.display = 'flex';
+        players.style.display = 'none';
         document.getElementById('room').style.display = 'none';
         // broadcast the start of the game
         ws.send(JSON.stringify({roomCode: roomCode, type: 'start-game'}));
+        ws.send(JSON.stringify(val));
     });
 
     characterSend.addEventListener('click', () => {
-        const val = {
+        val = {
             oponentName: oponentNameInput?.value,
             character: characterInput?.value,
             roomCode: roomCode,
-            playerName: playerName,
-            type: 'characterSend',
+            type: 'sendCharacters'
         };
+
+        const ready = {
+            roomCode: roomCode,
+            playerName: playerName,
+            type: 'playerReady',
+        }
 
         const form = document.querySelector('.input-block');
         if (form) {
@@ -101,7 +111,7 @@
         } else if (!ws) {
             return;
         }
-        ws.send(JSON.stringify(val));
+        ws.send(JSON.stringify(ready));
         createMessageDiv(val.oponentName, val.character);
     }); 
 
@@ -117,7 +127,7 @@
             if (playerName === object.oponentName) {
                 console.log(`watttt ${object.oponentName}`);
                 createMessageDiv(object.oponentName, "???????");
-                playerReady(object.playerName);
+                changeCircleBorder(object.playerName);
             } else if (object.type === 'name'){
                 
                 // Extracting all the names from the map into an array `allNames` and their status into different array
@@ -136,7 +146,7 @@
 
                             // if the player was ready change the circle color to green
                             if(allIsReady[i] === 1){
-                                playerReady(allNames[i]);
+                                changeCircleBorder(allNames[i]);
                             }
                         }
 
@@ -147,14 +157,17 @@
                     createPlayerCircle(allNames[allNames.length - 1]);
                 }
             } else if (object.type === 'start-game'){
+                ws.send(JSON.stringify(val));
                 startGame.style.display = 'none';
                 messages.style.display = 'flex';
+                players.style.display = 'none';
                 document.getElementById('room').style.display = 'none'; 
                 document.getElementById('start-game-message').style.display = 'none';
-            } else{
+            } else if (object.type === 'sendCharacters'){
                 console.log(`O CO CHODZIIIIIIIIIIII ${object.playerName}`)
-                createMessageDiv(object.oponentName, object.character);
-                playerReady(object.playerName);
+                createMessageDiv(object.oponentName, object.character);   
+            } else if (object.type === 'playerReady'){
+                changeCircleBorder(object.playerName);
             }
         }
         
@@ -183,10 +196,6 @@
         opponentsList.appendChild(option);
     }
 
-    function showMessage(message) {
-        messages.textContent += `\n${message}`;
-    }
-
     function createPlayerCircle( name ) {
         const circleDiv = document.createElement('div');
 
@@ -196,8 +205,7 @@
         players.appendChild(circleDiv);
     }
 
-    function playerReady( name ){
-        console.log(`o CO CHODZI ${name}`)
+    function changeCircleBorder( name ){
         const player = document.getElementById(name); 
         player.style.border = '3px solid #28A745';
     }

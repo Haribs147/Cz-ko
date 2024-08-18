@@ -84,7 +84,7 @@ wss.on('connection',async function connection(ws) {
 
     const message = JSON.parse(data);
 
-    if(message.type === 'characterSend'){
+    if(message.type === 'playerReady'){
       
       try {
 
