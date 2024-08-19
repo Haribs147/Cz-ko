@@ -7,15 +7,13 @@
 <div class="input-block">
 
 
-    <input type="text" list="opponents" id="opponent-input" placeholder="Enter your opponent">
+    <input type="text" list="opponents" id="opponent-input" placeholder="Enter your opponent" >
     
     <datalist id="opponents">
 
     </datalist>
-    <!-- <input type="text" id="oponent-input" placeholder="Enter your oponent"> -->
 
-
-    <input type="text" id="character-input" placeholder="Enter your oponents character">
+    <input type="text" id="character-input" placeholder="Enter your oponents character" >
 
     
 
@@ -68,7 +66,7 @@
         roomParagraph.textContent = roomCode;
         console.log(`IMIEEEEEEE ${playerName}`)
         //save the player name into allNames
-        ws.send(JSON.stringify({roomCode: roomCode, type: 'name', name: playerName })); //wysyłam całą tablicę osób, jakie są w grze i jeżeli czyDostalem = 0 to biorę całą tablice i tworze forem, a jeżeli czyDostalem = 1 to biorę ostatni indeks tablicy i dodaję
+        ws.send(JSON.stringify({roomCode: roomCode, type: 'name', name: playerName })); 
     };
 
     startGame.addEventListener('click', () => {
@@ -82,6 +80,11 @@
     });
 
     characterSend.addEventListener('click', () => {
+
+        if(oponentNameInput.value === "" || characterInput.value === ""){
+            window.alert("Please enter both your opponent's name and character.");
+            return;
+        }
         val = {
             oponentName: oponentNameInput?.value,
             character: characterInput?.value,
