@@ -202,6 +202,7 @@ app.post('/submit-name', async (req, res) => {
       console.log(`Joining room for: ${name}`);
 
       try {
+
         // Check if the room exists
         const result = await db.query(
           "SELECT ID FROM game_room WHERE code = $1",
@@ -211,13 +212,24 @@ app.post('/submit-name', async (req, res) => {
         if (result.rows.length > 0) {
           const roomId = result.rows[0].id;
 
-          await db.query(
-            "INSERT INTO players (name, room_id) VALUES ($1, $2)",
-            [name, roomId]
+          // Check if the player name is unique
+          const nameCheck = await db.query(
+            "SELECT name FROM players WHERE room_id = $1 AND name = $2",
+            [roomId, name]
           );
-          res.render('index', { name: name, code: code, isHost: 0 });
+          
+          if (nameCheck.rows.length > 0) {
+            res.render('error-handler', { error: name, type: "duplicate-name" });
+          } else {
+            await db.query(
+              "INSERT INTO players (name, room_id) VALUES ($1, $2)",
+              [name, roomId]
+            );
+            res.render('index', { name: name, code: code, isHost: 0 });
+          }
+
         } else {
-          res.render('error-handler', { roomCode: code, type: "room-code"});
+          res.render('error-handler', { error: code, type: "room-code"});
         }
       } catch (err) {
         console.log(err);

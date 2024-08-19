@@ -2,7 +2,10 @@
 
 <script>
     if("<%= type %>" === "room-code"){
-        alert("Room with code <%= roomCode %> not found. Please try again.");
+        alert("Room with code <%= error %> not found. Please try again.");
+        window.location.href = "/";
+    } else{
+        alert("The name <%= error %> is already taken, please enter your fullname or choose a different name");
         window.location.href = "/";
     }
 </script>
