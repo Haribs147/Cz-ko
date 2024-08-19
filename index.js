@@ -166,8 +166,21 @@ app.post('/submit-name', async (req, res) => {
   if (name) {
     if (action === 'create') {
       console.log(`Creating room for: ${name}`);
-      const generatedCode = generateRandomCode(5);
+      let generatedCode = generateRandomCode(5);
+    
       try {
+        
+        let isCodeTaken = true;
+        while (isCodeTaken) {
+          const result = await db.query("SELECT ID FROM game_room WHERE code = $1", [generatedCode]);
+          if (result.rows.length === 0) {
+            isCodeTaken = false;
+          } else {
+            // Generate a new code if it's taken
+            generatedCode = generateRandomCode(5);
+          }
+        }
+
         const roomResult = await db.query(
           "INSERT INTO game_room (code, host_id) VALUES ($1, $2) RETURNING ID",
           [generatedCode, 0]
