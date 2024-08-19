@@ -1,0 +1,10 @@
+<%- include('partials/header.ejs'); -%>
+
+<script>
+    if("<%= type %>" === "room-code"){
+        alert("Room with code <%= roomCode %> not found. Please try again.");
+        window.location.href = "/";
+    }
+</script>
+
+<%- include('partials/footer.ejs'); -%>

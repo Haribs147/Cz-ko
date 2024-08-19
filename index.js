@@ -7,6 +7,7 @@ import bodyParser from 'body-parser';
 import pg from 'pg';
 import { randomBytes } from 'crypto';
 import dotenv from 'dotenv';
+import { type } from 'os';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -169,7 +170,7 @@ app.post('/submit-name', async (req, res) => {
       let generatedCode = generateRandomCode(5);
     
       try {
-        
+
         let isCodeTaken = true;
         while (isCodeTaken) {
           const result = await db.query("SELECT ID FROM game_room WHERE code = $1", [generatedCode]);
@@ -216,7 +217,7 @@ app.post('/submit-name', async (req, res) => {
           );
           res.render('index', { name: name, code: code, isHost: 0 });
         } else {
-          res.status(404).json({ message: 'Room not found.' });
+          res.render('error-handler', { roomCode: code, type: "room-code"});
         }
       } catch (err) {
         console.log(err);
