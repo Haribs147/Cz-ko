@@ -63,15 +63,13 @@
     
 
     ws.onopen = () => {
-        playerName = "<%= name %>";  // The name is passed from the server-side EJS rendering
+        playerName = "<%= name %>";  
         roomCode = "<%= code %>"
         isHost = "<%= isHost %>";
         roomParagraph.textContent = roomCode;
         console.log(`IMIEEEEEEE ${playerName}`)
-        // send the newly joined player name to the rest of the players
-        ws.send(JSON.stringify({roomCode: roomCode, type: 'name', name: playerName })); 
-        // send a request to get all characters from db
-        ws.send(JSON.stringify({roomCode: roomCode, type: 'get-characters-request'}));
+        // Get info about the status of the game from the db and send your name to the other players
+        ws.send(JSON.stringify({roomCode: roomCode, type: 'get-data-from-db', name: playerName })); 
     };
 
     startGame.addEventListener('click', () => {
@@ -140,7 +138,7 @@
                 console.log(`watttt ${object.oponentName}`);
                 createMessageDiv(object.oponentName, "???????");
                 changeCircleBorder(object.playerName);
-            } else if (object.type === 'name'){
+            } else if (object.type === 'names'){
                 
                 // Extracting all the names from the map into an array `allNames` and their status into different array
                 const allNames = object.allNames.map(obj => obj.name);
@@ -202,11 +200,7 @@
     function createMessageDiv(oponentName, character) {
         // Create a new div element
         const messageDiv = document.createElement('div');
-
-        // Set the content of the div
         messageDiv.textContent = `${oponentName} - ${character}`;
-
-        // Optionally, add a class for styling
         messageDiv.classList.add('message');
 
         // Append the new div to the messages container

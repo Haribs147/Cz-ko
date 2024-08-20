@@ -146,9 +146,23 @@ wss.on('connection',async function connection(ws) {
       }
     }
 
-    if(message.type === 'name'){
+    if(message.type === 'get-data-from-db'){
 
       try {
+
+        const charactersResult = await db.query(
+          `SELECT players.name, players.character FROM players JOIN game_room ON players.room_id = game_room.ID WHERE game_room.code = $1 AND players.character IS NOT NULL`,
+          [message.roomCode]
+        );
+  
+        // Send all characters and opponent names to the newly connected client
+        const sendCharacters = {
+          type: 'existingCharacters',
+          characters: charactersResult.rows,
+          roomCode: message.roomCode,
+        };
+        console.log(`CHARACTERS SEND WUT ${charactersResult}`)
+        ws.send(JSON.stringify(sendCharacters));
 
         // Get names from the db
         const result = await db.query(
@@ -156,7 +170,7 @@ wss.on('connection',async function connection(ws) {
           , [message.roomCode]);
 
         const sendNames = {
-          type: 'name',
+          type: 'names',
           allNames: result.rows,
           roomCode: message.roomCode,
         };
