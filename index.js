@@ -54,6 +54,7 @@ async function setupDatabase() {
       CREATE TABLE IF NOT EXISTS players (
         ID SERIAL PRIMARY KEY,
         name VARCHAR(15) NOT NULL,
+        character VARCHAR(20),
         isReady INT,
         room_id INT REFERENCES game_room(ID)
       );
@@ -85,15 +86,37 @@ wss.on('connection',async function connection(ws) {
 
     const message = JSON.parse(data);
 
-    if(message.type === 'playerReady'){
+    if(message.type === 'get-characters-request'){
+      try {
+        // Fetch all characters and their respective player names in the room 
+        const charactersResult = await db.query(
+          `SELECT players.name, players.character FROM players JOIN game_room ON players.room_id = game_room.ID WHERE game_room.code = $1 AND players.character IS NOT NULL`,
+          [message.roomCode]
+        );
+  
+        // Send all characters and opponent names to the newly connected client
+        const sendCharacters = {
+          type: 'existingCharacters',
+          characters: charactersResult.rows,
+          roomCode: message.roomCode,
+        };
+        console.log(`CHARACTERS SEND WUT ${charactersResult}`)
+        ws.send(JSON.stringify(sendCharacters));
+      } catch (err) {
+        console.log('Error sending existing characters:', err);
+        ws.send(JSON.stringify({ message: 'An error occurred while sending the existing characters' }));
+      }
+    }
+
+    if(message.type === 'updateDB'){
       
       try {
-
-        // update the ready status of the player
+        
         const playerName = message.playerName;
         const roomCode = message.roomCode;
-
-        // Update the ready status of the player in the specified room
+        const character = message.character;
+        const oponentName = message.oponentName
+        // Update the ready status of the player that clicked the button
         await db.query(
           `UPDATE players 
            SET isReady = 1 
@@ -104,7 +127,18 @@ wss.on('connection',async function connection(ws) {
           [playerName, roomCode]
         );
 
-        console.log(`Player ${playerName} in room ${roomCode} is now ready.`);
+        // Update the character of the opponent of the player that clicked the button
+        await db.query(
+          `UPDATE players 
+           SET character = $1 
+           FROM game_room 
+           WHERE players.room_id = game_room.ID 
+           AND players.name = $2 
+           AND game_room.code = $3;`,
+          [character, oponentName, roomCode]
+        );
+
+        console.log(`Player ${playerName} in room ${roomCode} is now ready and the character for ${oponentName} is added to db.`);
 
       } catch (err) {
         console.log(err);
@@ -127,6 +161,7 @@ wss.on('connection',async function connection(ws) {
           roomCode: message.roomCode,
         };
         console.log(sendNames);
+
         // Send all of the players names back
         wss.clients.forEach(function each(client) {
           if (client.readyState === ws.OPEN) {
@@ -141,7 +176,7 @@ wss.on('connection',async function connection(ws) {
       }
 
     } else{
-
+      
       wss.clients.forEach(function each(client) {
         if (client !== ws && client.readyState === ws.OPEN) {
           // Ensure that data is a string
@@ -160,7 +195,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/submit-name', async (req, res) => {
-  const name = req.body.name;
+  const name = req.body.name.charAt(0).toUpperCase() + req.body.name.slice(1).toLowerCase(); // Make the first letter of the name uppercase
   const action = req.body.action;
   const code = req.body.room;
 

@@ -87,16 +87,18 @@
 }   
 /* Individual message div styling */
 .message {
-    background-color: #e0e0e0;
-    padding: 10px 15px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    font-size: 14px;
-    flex: 1; /* Allows the divs to grow and fill the available space */
-    min-width: 120px; /* Minimum width for the message divs */
-    text-align: center; /* Centers the text inside each div */
-    }
-  
+  background-color: #e0e0e0;
+  padding: 10px 15px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  flex-grow: 1; 
+  min-width: 120px;
+  max-width: 100%;
+  word-wrap: break-word; 
+  text-align: center; 
+}
+
   /* Footer styling */
   #footer {
     background-color: #007bff;
