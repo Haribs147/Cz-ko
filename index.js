@@ -148,7 +148,10 @@ wss.on('connection',async function connection(ws) {
     }
 
     if(message.type === 'get-data-from-db'){
-
+      if (message.name && message.roomCode) {
+        ws.playerName = message.name;  // Store playerName in ws object
+        ws.roomCode = message.roomCode; // Store roomCode in ws object
+      }
       try {
 
         // Get data from the db
@@ -176,7 +179,7 @@ wss.on('connection',async function connection(ws) {
         res.status(500).json({ message: 'An error occurred while getting the names of the players' });
       }
     } else{
-      
+
       if ( message.type === 'start-game' ){
         await db.query(
           `UPDATE game_room 
@@ -196,6 +199,51 @@ wss.on('connection',async function connection(ws) {
     }
     
 
+  });
+
+  ws.on('close', async function() {
+    try {
+      if (ws.playerName && ws.roomCode) {
+        // Find the room ID associated with the room code
+        const roomResult = await db.query(
+          "SELECT ID FROM game_room WHERE code = $1",
+          [ws.roomCode]
+        );
+
+        if (roomResult.rows.length > 0) {
+          const roomId = roomResult.rows[0].id;
+
+          // Remove the player from the database
+          await db.query(
+            "DELETE FROM players WHERE name = $1 AND room_id = $2",
+            [ws.playerName, roomId]
+          );
+
+          console.log(`Player ${ws.playerName} has been removed from room ${ws.roomCode}`);
+
+          // Check if there are any players left in the room
+          const playerCountResult = await db.query(
+            "SELECT COUNT(*) FROM players WHERE room_id = $1",
+            [roomId]
+          );
+
+          // Convert to int
+          const playerCount = parseInt(playerCountResult.rows[0].count, 10);
+
+          // If no players are left, delete the room
+          if (playerCount === 0) {
+            await db.query(
+              "DELETE FROM game_room WHERE id = $1",
+              [roomId]
+            );
+
+            console.log(`Room ${ws.roomCode} has been deleted because there are no players left.`);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Error handling player disconnection:', err);
+    }
   });
 });
 
