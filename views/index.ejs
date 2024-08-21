@@ -13,7 +13,7 @@
     </datalist> -->
     
     <select id="opponent-select" > 
-        <option value="" disabled selected hidden>Enter your opponent</option>
+        <option value="" disabled selected hidden>Select your opponent</option>
     </select>
 
     
@@ -66,6 +66,8 @@
     var numberOfPlayers = 0;
     var readyPlayers = 0;
 
+    var playersTable = [];
+
     ws.onopen = () => {
         playerName = "<%= name %>";  
         roomCode = "<%= code %>"
@@ -90,14 +92,22 @@
     });
 
     characterSend.addEventListener('click', () => {
-
-        if(opponentSelect.value === "" || characterInput.value === ""){
+        const oponentName = opponentSelect.value;
+        const character = characterInput.value;
+        if(oponentName === "" || character === ""){
             window.alert("Please enter both your opponent's name and character.");
             return;
         }
+
+        if(playersTable.includes(oponentName)){
+            console.log(playersTable);
+            console.log("COOOOOOOOOOOOOOOOO222222222222222");
+            window.alert(`The character for ${oponentName} has already been added, please choose a different player`)
+            return;
+        }
         const val = {
-            oponentName: opponentSelect?.value,
-            character: characterInput?.value,
+            oponentName: oponentName,
+            character: character,
             playerName: playerName,
             roomCode: roomCode,
             type: 'sendCharacters'
@@ -107,8 +117,8 @@
             roomCode: roomCode,
             playerName: playerName,
             type: 'updateDB',
-            oponentName: opponentSelect?.value,
-            character: characterInput?.value,
+            oponentName: oponentName,
+            character: character,
         }
 
         const form = document.querySelector('.input-block');
@@ -127,8 +137,8 @@
         } else if (!ws) {
             return;
         }
+        
         ws.send(JSON.stringify(val));
-
         ws.send(JSON.stringify(ready));
         createMessageDiv(val.oponentName, val.character);
     }); 
@@ -186,8 +196,10 @@
                     createMessageDiv(object.oponentName, "???????");
                     changeCircleBorder(object.playerName);
                 } else{
+                    playersTable.push(object.oponentName);
                     createMessageDiv(object.oponentName, object.character); 
                     changeCircleBorder(object.playerName);
+                    deleteOption(object.oponentName);
                 }
                 
 
@@ -216,7 +228,7 @@
 
     function createOptionElement(oponentName){
         const option = document.createElement('option');
-
+        option.setAttribute('id', 'option-' + oponentName);
         option.value = `${oponentName}`;
         option.innerHTML = `${oponentName}`;
         // opponentsList.appendChild(option);
@@ -240,6 +252,10 @@
         player.style.border = '3px solid #28A745';
     }
 
+    function deleteOption ( name ){
+        const option = document.getElementById('option-' + name);
+        option.remove();
+    }
 </script>
 
 <%- include('partials/footer.ejs'); -%>
