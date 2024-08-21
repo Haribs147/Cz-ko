@@ -150,20 +150,14 @@ wss.on('connection',async function connection(ws) {
 
       try {
 
-        const charactersResult = await db.query(
-          `SELECT players.name, players.character FROM players JOIN game_room ON players.room_id = game_room.ID WHERE game_room.code = $1 AND players.character IS NOT NULL`,
-          [message.roomCode]
-        );
-
-        // Get names from the db
+        // Get data from the db
         const result = await db.query(
-          "SELECT players.name, players.isready FROM players JOIN game_room ON players.room_id = game_room.ID WHERE game_room.code = $1"
+          "SELECT players.name, players.character, players.isready FROM players JOIN game_room ON players.room_id = game_room.ID WHERE game_room.code = $1"
           , [message.roomCode]);
 
         const sendNames = {
           type: 'names',
           allNames: result.rows,
-          characters: charactersResult.rows,
           roomCode: message.roomCode,
         };
         console.log(sendNames);

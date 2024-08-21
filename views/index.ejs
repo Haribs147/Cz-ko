@@ -158,23 +158,30 @@
                 // Extracting all the names from the map into an array `allNames` and their status into different array
                 const allNames = object.allNames.map(obj => obj.name);
                 const allIsReady = object.allNames.map(obj => obj.isready);
+                const characters = object.allNames.map(obj => obj.character);
 
                 numberOfPlayers = allNames.length;
-                
-                            
-                const oponentNames = object.characters.map(obj => obj.name);
-                const characters = object.characters.map(obj => obj.character);
+            
 
                 if(messagesCount === 0){
 
-                    for (let i = 0; i < characters.length; i++){
-                        createMessageDiv(oponentNames[i], characters[i]);   
+                    for (let i = 0; i < allNames.length; i++){
+                        
                     }
 
                     for( let i = 0; i < allNames.length; i++ ){
 
+                        
+
                         if(allNames[i] != playerName){
-                            createOptionElement(allNames[i]);
+                            //if a player already has a character 
+                            if(characters[i] != null){ // if a player has a character create a message div 
+                                createMessageDiv(allNames[i], characters[i]);
+                            } else{ //if he doesn't have a character create and option element for him
+                                createOptionElement(allNames[i]);
+                            }
+                            
+
                             createPlayerCircle(allNames[i]);
 
                             // if the player was ready change the circle color to green
