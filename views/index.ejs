@@ -174,17 +174,17 @@
                         
 
                         if(allNames[i] != playerName){
-                            //if a player already has a character 
+
                             if(characters[i] != null){ // if a player has a character create a message div 
                                 createMessageDiv(allNames[i], characters[i]);
-                            } else{ //if he doesn't have a character create and option element for him
+                            } else{ //if he doesn't have a character create an option element for him
                                 createOptionElement(allNames[i]);
                             }
                             
 
                             createPlayerCircle(allNames[i]);
 
-                            // if the player was ready change the circle color to green
+                            // if the player was already ready change the circle color to green
                             if(allIsReady[i] === 1){
                                 changeCircleBorder(allNames[i]);
                             }

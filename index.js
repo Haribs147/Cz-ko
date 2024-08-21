@@ -8,6 +8,7 @@ import pg from 'pg';
 import { randomBytes } from 'crypto';
 import dotenv from 'dotenv';
 import { type } from 'os';
+import { measureMemory } from 'vm';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -48,7 +49,7 @@ async function setupDatabase() {
       CREATE TABLE IF NOT EXISTS game_room (
         ID SERIAL PRIMARY KEY,
         code VARCHAR(10) UNIQUE NOT NULL,
-        host_id INT
+        has_started INT
       );
 
       CREATE TABLE IF NOT EXISTS players (
@@ -174,9 +175,17 @@ wss.on('connection',async function connection(ws) {
         console.log(err);
         res.status(500).json({ message: 'An error occurred while getting the names of the players' });
       }
-
     } else{
       
+      if ( message.type === 'start-game' ){
+        await db.query(
+          `UPDATE game_room 
+           SET has_started = 1 
+           WHERE game_room.code = $1;`,
+          [message.roomCode]
+        );
+      }
+
       wss.clients.forEach(function each(client) {
         if (client !== ws && client.readyState === ws.OPEN) {
           // Ensure that data is a string
@@ -218,8 +227,8 @@ app.post('/submit-name', async (req, res) => {
         }
 
         const roomResult = await db.query(
-          "INSERT INTO game_room (code, host_id) VALUES ($1, $2) RETURNING ID",
-          [generatedCode, 0]
+          "INSERT INTO game_room (code) VALUES ($1) RETURNING ID",
+          [generatedCode]
         );
         const roomId = roomResult.rows[0].id;
 
@@ -240,13 +249,13 @@ app.post('/submit-name', async (req, res) => {
 
         // Check if the room exists
         const result = await db.query(
-          "SELECT ID FROM game_room WHERE code = $1",
+          "SELECT ID, has_started FROM game_room WHERE code = $1",
           [code]
         );
 
         if (result.rows.length > 0) {
           const roomId = result.rows[0].id;
-
+          const hasStarted = result.rows[0].has_started;
           // Check if the player name is unique
           const nameCheck = await db.query(
             "SELECT name FROM players WHERE room_id = $1 AND name = $2",
@@ -255,6 +264,8 @@ app.post('/submit-name', async (req, res) => {
           
           if (nameCheck.rows.length > 0) {
             res.render('error-handler', { error: name, type: "duplicate-name" });
+          } else if( hasStarted != null) {
+            res.render('error-handler', { error: code, type: "the-game-has-started" });
           } else {
             await db.query(
               "INSERT INTO players (name, room_id) VALUES ($1, $2)",
