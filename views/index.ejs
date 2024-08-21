@@ -2,16 +2,21 @@
 
 <div class="flex-row-container" id="players">
 
-</div>
+</div>  
 
 <div class="input-block">
 
-
-    <input type="text" list="opponents" id="opponent-input" placeholder="Enter your opponent" >
+    <!-- <input type="text" list="opponents" id="opponent-input" placeholder="Enter your opponent" >
     
     <datalist id="opponents">
 
-    </datalist>
+    </datalist> -->
+    
+    <select id="opponent-select" > 
+        <option value="" disabled selected hidden>Enter your opponent</option>
+    </select>
+
+    
 
     <input type="text" id="character-input" placeholder="Enter your oponents character" >
 
@@ -38,8 +43,10 @@
 <script>
     const players = document.getElementById('players');
 
-    const oponentNameInput = document.getElementById('opponent-input');
-    const opponentsList = document.getElementById('opponents');
+    // const oponentNameInput = document.getElementById('opponent-input');
+    // const opponentsList = document.getElementById('opponents');
+
+    const opponentSelect = document.getElementById('opponent-select'); //newline
 
     const characterInput = document.getElementById('character-input');
 
@@ -84,12 +91,12 @@
 
     characterSend.addEventListener('click', () => {
 
-        if(oponentNameInput.value === "" || characterInput.value === ""){
+        if(opponentSelect.value === "" || characterInput.value === ""){
             window.alert("Please enter both your opponent's name and character.");
             return;
         }
         const val = {
-            oponentName: oponentNameInput?.value,
+            oponentName: opponentSelect?.value,
             character: characterInput?.value,
             playerName: playerName,
             roomCode: roomCode,
@@ -100,7 +107,7 @@
             roomCode: roomCode,
             playerName: playerName,
             type: 'updateDB',
-            oponentName: oponentNameInput?.value,
+            oponentName: opponentSelect?.value,
             character: characterInput?.value,
         }
 
@@ -208,10 +215,13 @@
     }
 
     function createOptionElement(oponentName){
-        const option = document.createElement('option')
+        const option = document.createElement('option');
 
-        option.value = `${oponentName}`
-        opponentsList.appendChild(option);
+        option.value = `${oponentName}`;
+        option.innerHTML = `${oponentName}`;
+        // opponentsList.appendChild(option);
+        opponentSelect.appendChild(option); //new line
+
     }
 
     function createPlayerCircle( name ) {

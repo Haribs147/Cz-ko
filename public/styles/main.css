@@ -37,8 +37,8 @@
     flex-direction: column;
 }
   
-  /* Input fields styling */
-  input[type="text"] {
+  /* Input and select fields styling */
+  input[type="text"], select {
     width: 100%;
     padding: 12px 15px;
     margin-bottom: 15px;
@@ -47,6 +47,16 @@
     font-size: 16px;
   }
   
+  /*styling for the placeholder for the select element */
+
+  select:invalid {
+    color: #ccc; /* Same color as placeholder */
+  }
+
+  select option[disabled][hidden] {
+    display: none;
+  }
+
   /* Button styling */
   button[type="submit"],
   .button {
