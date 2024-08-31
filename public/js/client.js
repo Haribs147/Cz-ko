@@ -14,7 +14,7 @@ const messages = document.getElementById("messages");
 
 const roomParagraph = document.getElementById("room-code");
 
-const ws = new WebSocket("ws://localhost:3000"); //wss://heads-up-1.onrender.com
+const ws = new WebSocket("wss://heads-up-1.onrender.com"); //ws://localhost:3000
 
 var playerName;
 var messagesCount = 0;
