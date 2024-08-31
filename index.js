@@ -17,7 +17,9 @@ dotenv.config();
 const app = express();
 const server = createServer(app);
 
-app.use(express.static(path.join(path.resolve(), 'public')));
+const __dirname = path.resolve();
+app.use(express.static(path.join(__dirname, "public")));
+
 
 // Setup the database
 const db = new pg.Client({
