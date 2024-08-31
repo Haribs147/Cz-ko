@@ -1,54 +1,53 @@
 <%- include('partials/header.ejs'); -%>
 
-<div class="flex-row-container" id="players">
-
-</div>  
+<div class="flex-row-container" id="players"></div>
 
 <div class="input-block">
-
-    <!-- <input type="text" list="opponents" id="opponent-input" placeholder="Enter your opponent" >
+  <!-- <input type="text" list="opponents" id="opponent-input" placeholder="Enter your opponent" >
     
     <datalist id="opponents">
 
     </datalist> -->
-    
-    <select id="opponent-select" > 
-        <option value="" disabled selected hidden>Select your opponent</option>
-    </select>
 
-    
+  <select id="opponent-select">
+    <option value="" disabled selected hidden>Select your opponent</option>
+  </select>
 
-    <input type="text" id="character-input" placeholder="Enter your oponents character" >
+  <input
+    type="text"
+    id="character-input"
+    placeholder="Enter your oponents character"
+  />
 
-    
-
-    <button id="character-send" class="button">
-        Add character
-    </button>
-</div>  
-<div class="flex-col-container">
-    <p id="start-game-message" style="display: none;">Wait for host to start the game</p>
-    <button id="start-game" class="button">
-        Start Game
-    </button>
-
-    <p id="room">Room Code: <span id="room-code"><%= code %></span></p>
+  <button id="character-send" class="button">Add character</button>
 </div>
+<div class="flex-col-container">
+  <p id="start-game-message" style="display: none">
+    Wait for host to start the game
+  </p>
+  <button id="start-game" class="button">Start Game</button>
 
+  <p id="room">Room Code: <span id="room-code"><%= code %></span></p>
+</div>
 
 <pre id="messages"></pre>
 
-
 <script src="/js/client.js"></script>
 <script>
-    ws.onopen = () => {
-        playerName = "<%= name %>";  
-        roomCode = "<%= code %>"
-        isHost = "<%= isHost %>";
-        roomParagraph.textContent = roomCode;
-        // Get info about the status of the game from the db and send your name to the other players
-        ws.send(JSON.stringify({roomCode: roomCode, type: 'get-data-from-db', name: playerName })); 
-    };
+  ws.onopen = () => {
+    playerName = "<%= name %>";
+    roomCode = "<%= code %>";
+    isHost = "<%= isHost %>";
+    roomParagraph.textContent = roomCode;
+    // Get info about the status of the game from the db and send your name to the other players
+    ws.send(
+      JSON.stringify({
+        roomCode: roomCode,
+        type: "get-data-from-db",
+        name: playerName,
+      })
+    );
+  };
 </script>
 
 <%- include('partials/footer.ejs'); -%>

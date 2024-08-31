@@ -1,14 +1,14 @@
-import express from 'express';
-import { createServer } from 'http';
-import { WebSocketServer } from 'ws';
-import path from 'path';
-import ejs, { name } from 'ejs';
-import bodyParser from 'body-parser';
-import pg from 'pg';
-import { randomBytes } from 'crypto';
-import dotenv from 'dotenv';
-import { type } from 'os';
-import { measureMemory } from 'vm';
+import express from "express";
+import { createServer } from "http";
+import { WebSocketServer } from "ws";
+import path from "path";
+import ejs, { name } from "ejs";
+import bodyParser from "body-parser";
+import pg from "pg";
+import { randomBytes } from "crypto";
+import dotenv from "dotenv";
+import { type } from "os";
+import { measureMemory } from "vm";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -19,7 +19,6 @@ const server = createServer(app);
 
 const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, "public")));
-
 
 // Setup the database
 const db = new pg.Client({
@@ -35,17 +34,15 @@ db.connect();
 const wss = new WebSocketServer({ server });
 
 // Set the view engine to EJS
-app.set('view engine', 'ejs');
-app.set('views', path.join(path.resolve(), 'views'));
+app.set("view engine", "ejs");
+app.set("views", path.join(path.resolve(), "views"));
 
 // bodyParser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
 async function setupDatabase() {
   try {
-
     // SQL commands to create tables
     const createTablesQuery = `
       CREATE TABLE IF NOT EXISTS game_room (
@@ -66,10 +63,9 @@ async function setupDatabase() {
     // Execute the SQL commands
     await db.query(createTablesQuery);
 
-    console.log('Database setup complete.');
-
+    console.log("Database setup complete.");
   } catch (err) {
-    console.error('Error setting up the database:', err);
+    console.error("Error setting up the database:", err);
   } finally {
     // Close the connection
   }
@@ -78,47 +74,46 @@ async function setupDatabase() {
 // Run the setup function
 setupDatabase();
 
-wss.on('connection',async function connection(ws) {
-  console.log('A new client Connected!');
+wss.on("connection", async function connection(ws) {
+  console.log("A new client Connected!");
 
-  
-
-
-  ws.on('message', async function message(data) {
+  ws.on("message", async function message(data) {
     console.log(`received message: ${data}`);
 
     const message = JSON.parse(data);
 
-    if(message.type === 'get-characters-request'){
+    if (message.type === "get-characters-request") {
       try {
-        // Fetch all characters and their respective player names in the room 
+        // Fetch all characters and their respective player names in the room
         const charactersResult = await db.query(
           `SELECT players.name, players.character FROM players JOIN game_room ON players.room_id = game_room.ID WHERE game_room.code = $1 AND players.character IS NOT NULL`,
           [message.roomCode]
         );
-  
+
         // Send all characters and opponent names to the newly connected client
         const sendCharacters = {
-          type: 'existingCharacters',
+          type: "existingCharacters",
           characters: charactersResult.rows,
           roomCode: message.roomCode,
         };
-        console.log(`CHARACTERS SEND WUT ${charactersResult}`)
+        console.log(`CHARACTERS SEND WUT ${charactersResult}`);
         ws.send(JSON.stringify(sendCharacters));
       } catch (err) {
-        console.log('Error sending existing characters:', err);
-        ws.send(JSON.stringify({ message: 'An error occurred while sending the existing characters' }));
+        console.log("Error sending existing characters:", err);
+        ws.send(
+          JSON.stringify({
+            message: "An error occurred while sending the existing characters",
+          })
+        );
       }
     }
 
-    if(message.type === 'updateDB'){
-      
+    if (message.type === "updateDB") {
       try {
-        
         const playerName = message.playerName;
         const roomCode = message.roomCode;
         const character = message.character;
-        const oponentName = message.oponentName
+        const oponentName = message.oponentName;
         // Update the ready status of the player that clicked the button
         await db.query(
           `UPDATE players 
@@ -141,28 +136,33 @@ wss.on('connection',async function connection(ws) {
           [character, oponentName, roomCode]
         );
 
-        console.log(`Player ${playerName} in room ${roomCode} is now ready and the character for ${oponentName} is added to db.`);
-
+        console.log(
+          `Player ${playerName} in room ${roomCode} is now ready and the character for ${oponentName} is added to db.`
+        );
       } catch (err) {
         console.log(err);
-        res.status(500).json({ message: 'An error occurred while updating the status of a player' });
+        res
+          .status(500)
+          .json({
+            message: "An error occurred while updating the status of a player",
+          });
       }
     }
 
-    if(message.type === 'get-data-from-db'){
+    if (message.type === "get-data-from-db") {
       if (message.name && message.roomCode) {
-        ws.playerName = message.name;  // Store playerName in ws object
+        ws.playerName = message.name; // Store playerName in ws object
         ws.roomCode = message.roomCode; // Store roomCode in ws object
       }
       try {
-
         // Get data from the db
         const result = await db.query(
-          "SELECT players.name, players.character, players.isready FROM players JOIN game_room ON players.room_id = game_room.ID WHERE game_room.code = $1"
-          , [message.roomCode]);
+          "SELECT players.name, players.character, players.isready FROM players JOIN game_room ON players.room_id = game_room.ID WHERE game_room.code = $1",
+          [message.roomCode]
+        );
 
         const sendNames = {
-          type: 'names',
+          type: "names",
           allNames: result.rows,
           roomCode: message.roomCode,
         };
@@ -175,14 +175,16 @@ wss.on('connection',async function connection(ws) {
             client.send(JSON.stringify(sendNames));
           }
         });
-
       } catch (err) {
         console.log(err);
-        res.status(500).json({ message: 'An error occurred while getting the names of the players' });
+        res
+          .status(500)
+          .json({
+            message: "An error occurred while getting the names of the players",
+          });
       }
-    } else{
-
-      if ( message.type === 'start-game' ){
+    } else {
+      if (message.type === "start-game") {
         await db.query(
           `UPDATE game_room 
            SET has_started = 1 
@@ -197,13 +199,10 @@ wss.on('connection',async function connection(ws) {
           client.send(JSON.stringify(message));
         }
       });
-
     }
-    
-
   });
 
-  ws.on('close', async function() {
+  ws.on("close", async function () {
     try {
       if (ws.playerName && ws.roomCode) {
         // Find the room ID associated with the room code
@@ -221,7 +220,9 @@ wss.on('connection',async function connection(ws) {
             [ws.playerName, roomId]
           );
 
-          console.log(`Player ${ws.playerName} has been removed from room ${ws.roomCode}`);
+          console.log(
+            `Player ${ws.playerName} has been removed from room ${ws.roomCode}`
+          );
 
           // Check if there are any players left in the room
           const playerCountResult = await db.query(
@@ -234,40 +235,43 @@ wss.on('connection',async function connection(ws) {
 
           // If no players are left, delete the room
           if (playerCount === 0) {
-            await db.query(
-              "DELETE FROM game_room WHERE id = $1",
-              [roomId]
-            );
+            await db.query("DELETE FROM game_room WHERE id = $1", [roomId]);
 
-            console.log(`Room ${ws.roomCode} has been deleted because there are no players left.`);
+            console.log(
+              `Room ${ws.roomCode} has been deleted because there are no players left.`
+            );
           }
         }
       }
     } catch (err) {
-      console.error('Error handling player disconnection:', err);
+      console.error("Error handling player disconnection:", err);
     }
   });
 });
 
-app.get('/', (req, res) => {
-  res.render('login');
+app.get("/", (req, res) => {
+  res.render("login");
 });
 
-app.post('/submit-name', async (req, res) => {
-  const name = req.body.name.charAt(0).toUpperCase() + req.body.name.slice(1).toLowerCase(); // Make the first letter of the name uppercase
+app.post("/submit-name", async (req, res) => {
+  const name =
+    req.body.name.charAt(0).toUpperCase() +
+    req.body.name.slice(1).toLowerCase(); // Make the first letter of the name uppercase
   const action = req.body.action;
   const code = req.body.room;
 
   if (name) {
-    if (action === 'create') {
+    if (action === "create") {
       console.log(`Creating room for: ${name}`);
       let generatedCode = generateRandomCode(5);
-    
-      try {
 
+      try {
         let isCodeTaken = true;
         while (isCodeTaken) {
-          const result = await db.query("SELECT ID FROM game_room WHERE code = $1", [generatedCode]);
+          const result = await db.query(
+            "SELECT ID FROM game_room WHERE code = $1",
+            [generatedCode]
+          );
           if (result.rows.length === 0) {
             isCodeTaken = false;
           } else {
@@ -282,21 +286,22 @@ app.post('/submit-name', async (req, res) => {
         );
         const roomId = roomResult.rows[0].id;
 
-        await db.query(
-          "INSERT INTO players (name, room_id) VALUES ($1, $2)",
-          [name, roomId]
-        );
+        await db.query("INSERT INTO players (name, room_id) VALUES ($1, $2)", [
+          name,
+          roomId,
+        ]);
 
-        res.render('index', { name: name, code: generatedCode, isHost: 1 });
+        res.render("index", { name: name, code: generatedCode, isHost: 1 });
       } catch (err) {
         console.log(err);
-        res.status(500).json({ message: 'An error occurred while creating the room.' });
+        res
+          .status(500)
+          .json({ message: "An error occurred while creating the room." });
       }
-    } else if (action === 'join') {
+    } else if (action === "join") {
       console.log(`Joining room for: ${name}`);
 
       try {
-
         // Check if the room exists
         const result = await db.query(
           "SELECT ID, has_started FROM game_room WHERE code = $1",
@@ -311,36 +316,46 @@ app.post('/submit-name', async (req, res) => {
             "SELECT name FROM players WHERE room_id = $1 AND name = $2",
             [roomId, name]
           );
-          
+
           if (nameCheck.rows.length > 0) {
-            res.render('error-handler', { error: name, type: "duplicate-name" });
-          } else if( hasStarted != null) {
-            res.render('error-handler', { error: code, type: "the-game-has-started" });
+            res.render("error-handler", {
+              error: name,
+              type: "duplicate-name",
+            });
+          } else if (hasStarted != null) {
+            res.render("error-handler", {
+              error: code,
+              type: "the-game-has-started",
+            });
           } else {
             await db.query(
               "INSERT INTO players (name, room_id) VALUES ($1, $2)",
               [name, roomId]
             );
-            res.render('index', { name: name, code: code, isHost: 0 });
+            res.render("index", { name: name, code: code, isHost: 0 });
           }
-
         } else {
-          res.render('error-handler', { error: code, type: "room-code"});
+          res.render("error-handler", { error: code, type: "room-code" });
         }
       } catch (err) {
         console.log(err);
-        res.status(500).json({ message: 'An error occurred while joining the room.' });
+        res
+          .status(500)
+          .json({ message: "An error occurred while joining the room." });
       }
     } else {
-      res.status(400).json({ message: 'Invalid action.' });
+      res.status(400).json({ message: "Invalid action." });
     }
   } else {
-    res.status(400).json({ message: 'Name is required.' });
+    res.status(400).json({ message: "Name is required." });
   }
 });
 
 function generateRandomCode(length) {
-  return randomBytes(Math.ceil(length / 2)).toString('hex').slice(0, length).toUpperCase();
+  return randomBytes(Math.ceil(length / 2))
+    .toString("hex")
+    .slice(0, length)
+    .toUpperCase();
 }
 
 server.listen(process.env.PORT || 3000, () => {

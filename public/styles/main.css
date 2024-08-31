@@ -1,100 +1,101 @@
 /* Resetting some basic styles for better consistency across browsers */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
-  }
-  
-  /* General body styles */
-  body {
-    background-color: #f4f4f4;
-    color: #333;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-  
-  main {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    padding: 20px;
-  }
-  
-  /* Styling the form */
-  form#name-form,
-  .input-block {
-    width: 100%;
-    max-width: 400px;
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    display: flex; 
-    flex-direction: column;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
 }
-  
-  /* Input and select fields styling */
-  input[type="text"], select {
-    width: 100%;
-    padding: 12px 15px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-  }
-  
-  /*styling for the placeholder for the select element */
 
-  select:invalid {
-    color: #ccc; /* Same color as placeholder */
-  }
+/* General body styles */
+body {
+  background-color: #f4f4f4;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 
-  select option[disabled][hidden] {
-    display: none;
-  }
+main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 20px;
+}
 
-  /* Button styling */
-  button[type="submit"],
-  .button {
-    width: 100%;
-    padding: 12px 15px;
-    background-color: #007bff;
-    border: none;
-    border-radius: 4px;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  button[type="submit"]{
-    width: 48%;
-  }
-  .buttons-container{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-  }
-  button[type="submit"]:hover,
-  .button:hover {
-    background-color: #0056b3;
-  }
+/* Styling the form */
+form#name-form,
+.input-block {
+  width: 100%;
+  max-width: 400px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Input and select fields styling */
+input[type="text"],
+select {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+/*styling for the placeholder for the select element */
+
+select:invalid {
+  color: #ccc; /* Same color as placeholder */
+}
+
+select option[disabled][hidden] {
+  display: none;
+}
+
+/* Button styling */
+button[type="submit"],
+.button {
+  width: 100%;
+  padding: 12px 15px;
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+button[type="submit"] {
+  width: 48%;
+}
+.buttons-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+button[type="submit"]:hover,
+.button:hover {
+  background-color: #0056b3;
+}
 /* Container for the message divs */
 #messages {
-    display: none; /*this display will change to flex when some1 hits the start button*/
-    flex-wrap: wrap; /* Allows wrapping to a new line if there's not enough space */
-    gap: 15px; /* Defines the gap between the message divs */
-    margin-top: 15px;
-    padding: 15px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}   
+  display: none; /*this display will change to flex when some1 hits the start button*/
+  flex-wrap: wrap; /* Allows wrapping to a new line if there's not enough space */
+  gap: 15px; /* Defines the gap between the message divs */
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
 /* Individual message div styling */
 .message {
   background-color: #e0e0e0;
@@ -102,51 +103,51 @@
   border-radius: 5px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   font-size: 14px;
-  flex-grow: 1; 
+  flex-grow: 1;
   min-width: 120px;
   max-width: 100%;
-  word-wrap: break-word; 
-  text-align: center; 
+  word-wrap: break-word;
+  text-align: center;
 }
 
-  /* Footer styling */
-  #footer {
-    background-color: #007bff;
-    color: white;
-    text-align: center;
-    padding: 15px;
-    margin-top: auto;
-    border-top: 5px solid #0056b3;
-  }
-  
-  #footer a {
-    color: white;
-    text-decoration: none;
-  }
-  
-  #footer a:hover {
-    text-decoration: underline;
-  }
-  
-  #start-game {
-    display: none;
-    max-width: 150px;
-  }
+/* Footer styling */
+#footer {
+  background-color: #007bff;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  margin-top: auto;
+  border-top: 5px solid #0056b3;
+}
 
-  #room {
-    margin-top: 15px; 
-    font-size: 16px;
-    font-weight: bold;
-    color: #333;
-    text-align: center; 
+#footer a {
+  color: white;
+  text-decoration: none;
+}
+
+#footer a:hover {
+  text-decoration: underline;
+}
+
+#start-game {
+  display: none;
+  max-width: 150px;
+}
+
+#room {
+  margin-top: 15px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
 }
 
 #room-code {
-    padding: 4px 0px;
-    border-radius: 2px;
-    font-size: 16px; 
+  padding: 4px 0px;
+  border-radius: 2px;
+  font-size: 16px;
 }
-.flex-col-container{
+.flex-col-container {
   margin-top: 1%;
   display: flex;
   justify-content: center;
@@ -154,7 +155,7 @@
   flex-direction: column;
 }
 
-.flex-row-container{
+.flex-row-container {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -165,7 +166,7 @@
 .circle {
   width: 40px;
   height: 40px;
-  border: 3px solid #FF4C4C ; /* #28A745 */
+  border: 3px solid #ff4c4c; /* #28A745 */
   border-radius: 50%;
   display: flex;
   align-items: center;
