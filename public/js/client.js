@@ -14,7 +14,7 @@ const messages = document.getElementById("messages");
 
 const roomParagraph = document.getElementById("room-code");
 
-const ws = new WebSocket("wss://heads-up-1.onrender.com"); //ws://localhost:3000
+const ws = new WebSocket("ws://localhost:3000"); //wss://heads-up-1.onrender.com
 
 var playerName;
 var messagesCount = 0;
@@ -57,20 +57,12 @@ characterSend.addEventListener("click", () => {
     );
     return;
   }
-  const val = {
+  const sendCharacters = {
     oponentName: oponentName,
     character: character,
     playerName: playerName,
     roomCode: roomCode,
     type: "sendCharacters",
-  };
-
-  const ready = {
-    roomCode: roomCode,
-    playerName: playerName,
-    type: "updateDB",
-    oponentName: oponentName,
-    character: character,
   };
 
   const form = document.querySelector(".input-block");
@@ -84,15 +76,13 @@ characterSend.addEventListener("click", () => {
     document.getElementById("start-game-message").style.display = "block";
   }
 
-  if (!val) {
+  if (!sendCharacters) {
     return;
   } else if (!ws) {
     return;
   }
 
-  ws.send(JSON.stringify(val));
-  ws.send(JSON.stringify(ready));
-  createMessageDiv(val.oponentName, val.character);
+  ws.send(JSON.stringify(sendCharacters));
 });
 
 ws.onmessage = (event) => {
@@ -139,11 +129,20 @@ ws.onmessage = (event) => {
       }
     } else if (object.type === "sendCharacters") {
       if (playerName === object.oponentName) {
-        createMessageDiv(object.oponentName, "???????");
+        console.log(
+          `Sending character for ${object.oponentName} with URL: ${object.url}`
+        );
+        createMessageDiv(object.oponentName, "???????", object.url);
         changeCircleBorder(object.playerName);
+      } else if (playerName === object.playerName) {
+        //if statement for the person that clicked the characterSend button (this line was earlier in the eventlistener for character send button, but i had to change the code)
+        createMessageDiv(object.oponentName, object.character, object.url);
       } else {
         playersTable.push(object.oponentName);
-        createMessageDiv(object.oponentName, object.character);
+        console.log(
+          `Sending character for ${object.oponentName} with URL: ${object.url}`
+        );
+        createMessageDiv(object.oponentName, object.character, object.url);
         changeCircleBorder(object.playerName);
         deleteOption(object.oponentName);
       }
@@ -159,7 +158,7 @@ ws.onmessage = (event) => {
   console.log(playerName);
 };
 
-function createMessageDiv(oponentName, character) {
+function createMessageDiv(oponentName, character, imgUrl) {
   // Create the main div element
   const messageDiv = document.createElement("div");
   messageDiv.classList.add("message");
@@ -169,7 +168,6 @@ function createMessageDiv(oponentName, character) {
   messageDiv.style.width = "300px";
   messageDiv.style.borderRadius = "8px";
 
-
   // Create a div for the background image
   const imageDiv = document.createElement("div");
   imageDiv.style.backgroundSize = "cover";
@@ -178,8 +176,12 @@ function createMessageDiv(oponentName, character) {
   imageDiv.style.height = "300px";
   imageDiv.style.borderRadius = "8px";
 
+  console.log(`IMG URL IS: ${imgUrl}`);
   if (character === "???????") {
     imageDiv.style.backgroundImage = "url('/images/questionMarks.png')";
+  } else {
+    console.log(`CZMEU NIE MA ZDJĘCIAAAAAA ${imgUrl}`);
+    imageDiv.style.backgroundImage = imgUrl;
   }
 
   const textParagraph = document.createElement("p");

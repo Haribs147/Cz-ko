@@ -9,9 +9,16 @@ import { randomBytes } from "crypto";
 import dotenv from "dotenv";
 import { type } from "os";
 import { measureMemory } from "vm";
+import axios from "axios";
+
+
 
 // Load environment variables from .env file
 dotenv.config();
+
+//api search enginge
+const apiKey = process.env.API_KEY;
+const searchEngineId = process.env.SEARCH_ENGINE_ID;
 
 // Create the Express app and HTTP server
 const app = express();
@@ -80,7 +87,7 @@ wss.on("connection", async function connection(ws) {
   ws.on("message", async function message(data) {
     console.log(`received message: ${data}`);
 
-    const message = JSON.parse(data);
+    var message = JSON.parse(data);
 
     if (message.type === "get-characters-request") {
       try {
@@ -108,7 +115,65 @@ wss.on("connection", async function connection(ws) {
       }
     }
 
-    if (message.type === "updateDB") {
+    if (message.type === "get-data-from-db") {
+      if (message.name && message.roomCode) {
+        ws.playerName = message.name; // Store playerName in ws object
+        ws.roomCode = message.roomCode; // Store roomCode in ws object
+      }
+      try {
+        // Get data from the db
+        const result = await db.query(
+          "SELECT players.name, players.character, players.isready FROM players JOIN game_room ON players.room_id = game_room.ID WHERE game_room.code = $1",
+          [message.roomCode]
+        );
+
+        const sendNames = {
+          type: "names",
+          allNames: result.rows,
+          roomCode: message.roomCode,
+        };
+        console.log(sendNames);
+
+        // Send all of the players names back
+        wss.clients.forEach(function each(client) {
+          if (client.readyState === ws.OPEN) {
+            // Ensure that data is a string
+            client.send(JSON.stringify(sendNames));
+          }
+        });
+      } catch (err) {
+        console.log(err);
+        res.status(500).json({
+          message: "An error occurred while getting the names of the players",
+        });
+      }
+    } else if (message.type === "sendCharacters") {
+      const query = message.character;
+      const url = `https: //www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${searchEngineId}&searchType=image&q=${encodeURIComponent(query)}&num=1`;
+      try {
+        const response = await axios.get(url);
+        const items = response.data.items;
+        if (items && items.length > 0) {
+          const imageUrl = items[0].link;
+          message.url = imageUrl;
+        } else {
+          message.url = "url('/images/429-status-code.png')";
+          console.log("No images found");
+        }
+      } catch (error) {
+        message.url = "url('/images/429-status-code.png')";
+        console.log(message);
+        console.error("Couldn't download an image from api", error);
+      }
+
+      wss.clients.forEach(function each(client) {
+        if (client.readyState === ws.OPEN) {
+          // Ensure that data is a string
+          client.send(JSON.stringify(message));
+        }
+      });
+
+      //UPDATE THE DB
       try {
         const playerName = message.playerName;
         const roomCode = message.roomCode;
@@ -141,48 +206,12 @@ wss.on("connection", async function connection(ws) {
         );
       } catch (err) {
         console.log(err);
-        res
-          .status(500)
-          .json({
-            message: "An error occurred while updating the status of a player",
-          });
-      }
-    }
-
-    if (message.type === "get-data-from-db") {
-      if (message.name && message.roomCode) {
-        ws.playerName = message.name; // Store playerName in ws object
-        ws.roomCode = message.roomCode; // Store roomCode in ws object
-      }
-      try {
-        // Get data from the db
-        const result = await db.query(
-          "SELECT players.name, players.character, players.isready FROM players JOIN game_room ON players.room_id = game_room.ID WHERE game_room.code = $1",
-          [message.roomCode]
-        );
-
-        const sendNames = {
-          type: "names",
-          allNames: result.rows,
-          roomCode: message.roomCode,
-        };
-        console.log(sendNames);
-
-        // Send all of the players names back
-        wss.clients.forEach(function each(client) {
-          if (client.readyState === ws.OPEN) {
-            // Ensure that data is a string
-            client.send(JSON.stringify(sendNames));
-          }
+        res.status(500).json({
+          message: "An error occurred while updating the status of a player",
         });
-      } catch (err) {
-        console.log(err);
-        res
-          .status(500)
-          .json({
-            message: "An error occurred while getting the names of the players",
-          });
-      }
+      }  
+      
+
     } else {
       if (message.type === "start-game") {
         await db.query(
