@@ -57,6 +57,7 @@ characterSend.addEventListener("click", () => {
     );
     return;
   }
+  
   const sendCharacters = {
     oponentName: oponentName,
     character: character,
@@ -93,22 +94,22 @@ ws.onmessage = (event) => {
   // Check if the player is the same as the current player or another player
 
   if (roomCode === object.roomCode) {
-    if (object.type === "names") {
+    if (object.type === "dataFromDb") {
+      console.log(`OBIEKT TO: ${object}`);
       // Extracting all the names from the map into an array `allNames` and their status into different array
-      const allNames = object.allNames.map((obj) => obj.name);
-      const allIsReady = object.allNames.map((obj) => obj.isready);
-      const characters = object.allNames.map((obj) => obj.character);
+      const allNames = object.data.map((obj) => obj.name);
+      const allIsReady = object.data.map((obj) => obj.isready);
+      const characters = object.data.map((obj) => obj.character);
+      const images = object.data.map((obj) => obj.url);
 
       numberOfPlayers = allNames.length;
 
       if (messagesCount === 0) {
-        for (let i = 0; i < allNames.length; i++) {}
-
         for (let i = 0; i < allNames.length; i++) {
           if (allNames[i] != playerName) {
             if (characters[i] != null) {
               // if a player has a character create a message div
-              createMessageDiv(allNames[i], characters[i]);
+              createMessageDiv(allNames[i], characters[i], images[i]);
             } else {
               //if he doesn't have a character create an option element for him
               createOptionElement(allNames[i]);

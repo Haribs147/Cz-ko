@@ -63,6 +63,7 @@ async function setupDatabase() {
         name VARCHAR(15) NOT NULL,
         character VARCHAR(20),
         isReady INT,
+        url VARCHAR(50),
         room_id INT REFERENCES game_room(ID)
       );
     `;
@@ -123,13 +124,13 @@ wss.on("connection", async function connection(ws) {
       try {
         // Get data from the db
         const result = await db.query(
-          "SELECT players.name, players.character, players.isready FROM players JOIN game_room ON players.room_id = game_room.ID WHERE game_room.code = $1",
+          "SELECT players.name, players.character, players.isready, players.url FROM players JOIN game_room ON players.room_id = game_room.ID WHERE game_room.code = $1",
           [message.roomCode]
         );
 
         const sendNames = {
-          type: "names",
-          allNames: result.rows,
+          type: "dataFromDb",
+          data: result.rows,
           roomCode: message.roomCode,
         };
         console.log(sendNames);
@@ -193,12 +194,13 @@ wss.on("connection", async function connection(ws) {
         // Update the character of the opponent of the player that clicked the button
         await db.query(
           `UPDATE players 
-           SET character = $1 
+           SET character = $1,
+               url = $2
            FROM game_room 
            WHERE players.room_id = game_room.ID 
-           AND players.name = $2 
-           AND game_room.code = $3;`,
-          [character, oponentName, roomCode]
+           AND players.name = $3
+           AND game_room.code = $4;`,
+          [character, message.url, oponentName, roomCode] //
         );
 
         console.log(
