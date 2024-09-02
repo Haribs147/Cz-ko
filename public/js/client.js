@@ -19,11 +19,28 @@ const ws = new WebSocket("ws://localhost:3000"); //wss://heads-up-1.onrender.com
 var playerName;
 var messagesCount = 0;
 var roomCode;
-var isHost = 0;
+var isHost;
 var numberOfPlayers = 0;
 var readyPlayers = 0;
 
 var playersTable = [];
+
+playerName = window.playerName;
+roomCode = window.roomCode;
+isHost = window.isHost;
+
+ws.onopen = () => {
+  console.log(`JESTEŚ HOSTEM? ${isHost}`);
+  roomParagraph.textContent = roomCode;
+  // Get info about the status of the game from the db and send your name to the other players
+  ws.send(
+    JSON.stringify({
+      roomCode: roomCode,
+      type: "get-data-from-db",
+      name: playerName,
+    })
+  );
+};
 
 startGame.addEventListener("click", () => {
   if (readyPlayers === numberOfPlayers - 1) {

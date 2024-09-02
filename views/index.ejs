@@ -32,22 +32,12 @@
 
 <pre id="messages"></pre>
 
-<script src="/js/client.js"></script>
-<script>
-  ws.onopen = () => {
-    playerName = "<%= name %>";
-    roomCode = "<%= code %>";
-    isHost = "<%= isHost %>";
-    roomParagraph.textContent = roomCode;
-    // Get info about the status of the game from the db and send your name to the other players
-    ws.send(
-      JSON.stringify({
-        roomCode: roomCode,
-        type: "get-data-from-db",
-        name: playerName,
-      })
-    );
-  };
+<script type="module">
+  window.playerName = "<%= name %>";
+  window.roomCode = "<%= code %>";
+  window.isHost = "<%= isHost %>";
 </script>
+<script type="module" src="/js/client.js"></script>
+
 
 <%- include('partials/footer.ejs'); -%>
