@@ -182,7 +182,7 @@ function createMessageDiv(oponentName, character, imgUrl) {
     imageDiv.style.backgroundImage = "url('/images/questionMarks.png')";
   } else {
     console.log(`CZMEU NIE MA ZDJĘCIAAAAAA ${imgUrl}`);
-    imageDiv.style.backgroundImage = imgUrl;
+    imageDiv.style.backgroundImage = `url(${imgUrl})`;
   }
 
   const textParagraph = document.createElement("p");

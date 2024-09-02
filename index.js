@@ -63,7 +63,7 @@ async function setupDatabase() {
         name VARCHAR(15) NOT NULL,
         character VARCHAR(20),
         isReady INT,
-        url VARCHAR(50),
+        url VARCHAR(250),
         room_id INT REFERENCES game_room(ID)
       );
     `;
@@ -150,7 +150,7 @@ wss.on("connection", async function connection(ws) {
       }
     } else if (message.type === "sendCharacters") {
       const query = message.character;
-      const url = `https: //www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${searchEngineId}&searchType=image&q=${encodeURIComponent(query)}&num=1`;
+      const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${searchEngineId}&searchType=image&q=${encodeURIComponent(query)}&num=1`;
       try {
         const response = await axios.get(url);
         const items = response.data.items;
