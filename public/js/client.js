@@ -9,12 +9,12 @@ const startGame = document.getElementById("start-game");
 const characters = document.getElementById("characters");
 const roomCodeParagraph = document.getElementById("room-code");
 
-const ws = new WebSocket("ws://localhost:3000"); //wss://heads-up-1.onrender.com
+const ws = new WebSocket("wss://heads-up-1.onrender.com"); //ws://localhost:3000
 
-var messagesCount = 0;
-var numberOfPlayers = 0;
-var readyPlayers = 0;
-var playersTable = [];
+let messagesCount = 0;
+let numberOfPlayers = 0;
+let readyPlayers = 0;
+let playersTable = [];
 
 // Load the variables from the index.ejs
 const playerName = window.playerName;
