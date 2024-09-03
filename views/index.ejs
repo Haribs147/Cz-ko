@@ -30,9 +30,10 @@
   <p id="room">Room Code: <span id="room-code"><%= code %></span></p>
 </div>
 
-<pre id="messages"></pre>
+<pre id="characters"></pre>
 
 <script type="module">
+  // Load the variables from the server
   window.playerName = "<%= name %>";
   window.roomCode = "<%= code %>";
   window.isHost = "<%= isHost %>";

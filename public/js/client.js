@@ -1,38 +1,29 @@
+import { createMessageDiv } from "./message-div.js";
+
+// Get elements from index.ejs
 const players = document.getElementById("players");
-
-// const oponentNameInput = document.getElementById('opponent-input');
-// const opponentsList = document.getElementById('opponents');
-
-const opponentSelect = document.getElementById("opponent-select"); //newline
-
+const opponentSelect = document.getElementById("opponent-select");
 const characterInput = document.getElementById("character-input");
-
 const characterSend = document.getElementById("character-send");
 const startGame = document.getElementById("start-game");
-
-const messages = document.getElementById("messages");
-
-const roomParagraph = document.getElementById("room-code");
+const characters = document.getElementById("characters");
+const roomCodeParagraph = document.getElementById("room-code");
 
 const ws = new WebSocket("ws://localhost:3000"); //wss://heads-up-1.onrender.com
 
-var playerName;
 var messagesCount = 0;
-var roomCode;
-var isHost;
 var numberOfPlayers = 0;
 var readyPlayers = 0;
-
 var playersTable = [];
 
-playerName = window.playerName;
-roomCode = window.roomCode;
-isHost = window.isHost;
+// Load the variables from the index.ejs
+const playerName = window.playerName;
+const roomCode = window.roomCode;
+const isHost = window.isHost;
 
+// When new client joins the room, get info about the status of the game from the db and send your name to the other players
 ws.onopen = () => {
-  console.log(`JESTEŚ HOSTEM? ${isHost}`);
-  roomParagraph.textContent = roomCode;
-  // Get info about the status of the game from the db and send your name to the other players
+  roomCodeParagraph.textContent = roomCode;
   ws.send(
     JSON.stringify({
       roomCode: roomCode,
@@ -43,12 +34,10 @@ ws.onopen = () => {
 };
 
 startGame.addEventListener("click", () => {
+  // When all the players are ready, hide the button and display characters
   if (readyPlayers === numberOfPlayers - 1) {
-    console.log(
-      ` players ready : ${readyPlayers}  no of players : ${numberOfPlayers}`
-    );
     startGame.style.display = "none";
-    messages.style.display = "flex";
+    characters.style.display = "flex";
     players.style.display = "none";
     document.getElementById("room").style.display = "none";
     // broadcast the start of the game
@@ -58,6 +47,7 @@ startGame.addEventListener("click", () => {
   }
 });
 
+// When client clicks character send button, send the data to the server
 characterSend.addEventListener("click", () => {
   const oponentName = opponentSelect.value;
   const character = characterInput.value;
@@ -67,8 +57,6 @@ characterSend.addEventListener("click", () => {
   }
 
   if (playersTable.includes(oponentName)) {
-    console.log(playersTable);
-    console.log("COOOOOOOOOOOOOOOOO222222222222222");
     window.alert(
       `The character for ${oponentName} has already been added, please choose a different player`
     );
@@ -83,11 +71,13 @@ characterSend.addEventListener("click", () => {
     type: "sendCharacters",
   };
 
+  // Hide the inputs
   const form = document.querySelector(".input-block");
   if (form) {
     form.style.display = "none";
   }
 
+  // If the client is the host show the start game button to him
   if (isHost == 1) {
     startGame.style.display = "block";
   } else {
@@ -166,7 +156,7 @@ ws.onmessage = (event) => {
       }
     } else if (object.type === "start-game") {
       startGame.style.display = "none";
-      messages.style.display = "flex";
+      characters.style.display = "flex";
       players.style.display = "none";
       document.getElementById("room").style.display = "none";
       document.getElementById("start-game-message").style.display = "none";
@@ -175,44 +165,6 @@ ws.onmessage = (event) => {
 
   console.log(playerName);
 };
-
-function createMessageDiv(oponentName, character, imgUrl) {
-  // Create the main div element
-  const messageDiv = document.createElement("div");
-  messageDiv.classList.add("message");
-  messageDiv.style.display = "flex";
-  messageDiv.style.flexDirection = "column";
-  messageDiv.style.alignItems = "center";
-  messageDiv.style.width = "300px";
-  messageDiv.style.borderRadius = "8px";
-
-  // Create a div for the background image
-  const imageDiv = document.createElement("div");
-  imageDiv.style.backgroundSize = "cover";
-  imageDiv.style.backgroundPosition = "center";
-  imageDiv.style.width = "280px";
-  imageDiv.style.height = "300px";
-  imageDiv.style.borderRadius = "8px";
-
-  console.log(`IMG URL IS: ${imgUrl}`);
-  if (character === "???????") {
-    imageDiv.style.backgroundImage = "url('/images/questionMarks.png')";
-  } else {
-    console.log(`CZMEU NIE MA ZDJĘCIAAAAAA ${imgUrl}`);
-    imageDiv.style.backgroundImage = `url(${imgUrl})`;
-  }
-
-  const textParagraph = document.createElement("p");
-  textParagraph.textContent = `${oponentName} - ${character}`;
-  textParagraph.style.textAlign = "center";
-  textParagraph.style.marginTop = "10px";
-
-  messageDiv.appendChild(imageDiv);
-  messageDiv.appendChild(textParagraph);
-
-  messages.appendChild(messageDiv);
-  console.log(`dodaje do diva ${oponentName} - ${character}`);
-}
 
 function createOptionElement(oponentName) {
   const option = document.createElement("option");
