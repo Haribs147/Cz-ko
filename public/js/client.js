@@ -6,7 +6,6 @@ const characterInput = document.getElementById("character-input");
 const characterSend = document.getElementById("character-send");
 const startGame = document.getElementById("start-game");
 const characters = document.getElementById("characters");
-const roomCodeParagraph = document.getElementById("room-code");
 
 const ws = new WebSocket("ws://localhost:3000"); //wss://heads-up-1.onrender.com
 
@@ -22,6 +21,7 @@ const isHost = window.isHost;
 
 // When new client joins the room, get info about the status of the game from the db and send your name to the other players
 ws.onopen = () => {
+  const roomCodeParagraph = document.getElementById("room-code");
   roomCodeParagraph.textContent = roomCode;
   ws.send(
     JSON.stringify({
