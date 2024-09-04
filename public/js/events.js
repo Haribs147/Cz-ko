@@ -53,17 +53,12 @@ export function registerEventListeners(wsManager) {
       roomCode: wsManager.roomCode,
       type: 'sendCharacters',
     };
-    console.log("tu sie wywala?");
     toggleDisplay('.input-block', 'none');
-    console.log("tu sie wywala??");
-
-    if (wsManager.isHost) {
+    if (wsManager.isHost == 1) {
       toggleDisplay('#start-game', 'block');
     } else {
       toggleDisplay('#start-game-message', 'block');
     }
-    console.log("tu sie wywala???");
-
     wsManager.sendMessage(sendCharacters);
   });
 }
