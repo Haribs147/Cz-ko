@@ -44,6 +44,12 @@ function createPlayerCircle(name) {
   playersContainer.appendChild(circleDiv);
 }
 
+// Function to toggle the display of a DOM element
+function toggleDisplay(element, displayStyle) {
+  let elementSelector = document.querySelector(element);
+  elementSelector.style.display = displayStyle;
+}
+
 function changeCircleBorder(name) {
   const player = document.getElementById(name);
   player.style.border = "3px solid #28A745"; // Green border to indicate ready
@@ -56,6 +62,8 @@ function deleteOption(name) {
   }
 }
 
-export { createMessageDiv, createOptionElement, createPlayerCircle, changeCircleBorder, deleteOption };
+
+
+export { createMessageDiv, createOptionElement, createPlayerCircle, changeCircleBorder, deleteOption, toggleDisplay };
 
 
