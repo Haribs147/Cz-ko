@@ -1,6 +1,5 @@
-import { createMessageDiv } from "./message-div.js";
+import { createMessageDiv, createOptionElement, createPlayerCircle, changeCircleBorder, deleteOption } from "./ui.js";
 
-// Get elements from index.ejs
 const players = document.getElementById("players");
 const opponentSelect = document.getElementById("opponent-select");
 const characterInput = document.getElementById("character-input");
@@ -9,7 +8,7 @@ const startGame = document.getElementById("start-game");
 const characters = document.getElementById("characters");
 const roomCodeParagraph = document.getElementById("room-code");
 
-const ws = new WebSocket("wss://heads-up-1.onrender.com"); //ws://localhost:3000
+const ws = new WebSocket("ws://localhost:3000"); //wss://heads-up-1.onrender.com
 
 let messagesCount = 0;
 let numberOfPlayers = 0;
@@ -127,6 +126,7 @@ ws.onmessage = (event) => {
             // if the player was already ready change the circle color to green
             if (allIsReady[i] === 1) {
               changeCircleBorder(allNames[i]);
+              readyPlayers++;
             }
           }
         }
@@ -142,6 +142,7 @@ ws.onmessage = (event) => {
         );
         createMessageDiv(object.oponentName, "???????", object.url);
         changeCircleBorder(object.playerName);
+        readyPlayers++;
       } else if (playerName === object.playerName) {
         //if statement for the person that clicked the characterSend button (this line was earlier in the eventlistener for character send button, but i had to change the code)
         createMessageDiv(object.oponentName, object.character, object.url);
@@ -152,6 +153,7 @@ ws.onmessage = (event) => {
         );
         createMessageDiv(object.oponentName, object.character, object.url);
         changeCircleBorder(object.playerName);
+        readyPlayers++;
         deleteOption(object.oponentName);
       }
     } else if (object.type === "start-game") {
@@ -166,32 +168,4 @@ ws.onmessage = (event) => {
   console.log(playerName);
 };
 
-function createOptionElement(oponentName) {
-  const option = document.createElement("option");
-  option.setAttribute("id", "option-" + oponentName);
-  option.value = `${oponentName}`;
-  option.innerHTML = `${oponentName}`;
-  // opponentsList.appendChild(option);
-  opponentSelect.appendChild(option); //new line
-}
 
-function createPlayerCircle(name) {
-  const circleDiv = document.createElement("div");
-
-  circleDiv.className = "circle";
-  circleDiv.id = name;
-  circleDiv.textContent = name[0].toUpperCase();
-  players.appendChild(circleDiv);
-}
-
-function changeCircleBorder(name) {
-  readyPlayers++;
-  console.log(`changing circle border for player : ${name}`);
-  const player = document.getElementById(name);
-  player.style.border = "3px solid #28A745";
-}
-
-function deleteOption(name) {
-  const option = document.getElementById("option-" + name);
-  option.remove();
-}
