@@ -89,7 +89,7 @@ wss.on("connection", async function connection(ws) {
     console.log(`received message: ${data}`);
 
     var message = JSON.parse(data);
-
+    console.log(`received message oponent name: ${message.opponentName}`);
     if (message.type === "get-characters-request") {
       try {
         // Fetch all characters and their respective player names in the room
@@ -149,6 +149,7 @@ wss.on("connection", async function connection(ws) {
         });
       }
     } else if (message.type === "sendCharacters") {
+      console.log(`ZARAZ OCHUJAM CO JEST message: ${message.character}`);
       const query = message.character;
       const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${searchEngineId}&searchType=image&q=${encodeURIComponent(query)}&num=1`;
       try {
@@ -173,13 +174,13 @@ wss.on("connection", async function connection(ws) {
           client.send(JSON.stringify(message));
         }
       });
-
+      const playerName = message.playerName;
+      const roomCode = message.roomCode;
+      const character = message.character;
+      const opponentName = message.opponentName;
       //UPDATE THE DB
       try {
-        const playerName = message.playerName;
-        const roomCode = message.roomCode;
-        const character = message.character;
-        const oponentName = message.oponentName;
+        
         // Update the ready status of the player that clicked the button
         await db.query(
           `UPDATE players 
@@ -200,11 +201,11 @@ wss.on("connection", async function connection(ws) {
            WHERE players.room_id = game_room.ID 
            AND players.name = $3
            AND game_room.code = $4;`,
-          [character, message.url, oponentName, roomCode] //
+          [character, message.url, opponentName, roomCode] //
         );
 
         console.log(
-          `Player ${playerName} in room ${roomCode} is now ready and the character for ${oponentName} is added to db.`
+          `Player ${playerName} in room ${roomCode} is now ready and the character for ${opponentName} is added to db.`
         );
       } catch (err) {
         console.log(err);

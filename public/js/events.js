@@ -47,12 +47,13 @@ export function registerEventListeners(wsManager) {
     }
 
     const sendCharacters = {
-      opponentName,
-      character,
+      opponentName: opponentName,
+      character: character,
       playerName: wsManager.playerName,
       roomCode: wsManager.roomCode,
       type: 'sendCharacters',
     };
+
     toggleDisplay('.input-block', 'none');
     if (wsManager.isHost == 1) {
       toggleDisplay('#start-game', 'block');
@@ -66,6 +67,7 @@ export function registerEventListeners(wsManager) {
 export function setupWebSocketHandlers(wsManager) {
   wsManager.on('dataFromDb', (data) => {
     // Handle the data received from the database
+    console.log("GETTING DATA FROM THE DBBBBBBBB");
     const allNames = data.data.map(obj => obj.name);
     const allIsReady = data.data.map(obj => obj.isready);
     const characters = data.data.map(obj => obj.character);
@@ -74,9 +76,17 @@ export function setupWebSocketHandlers(wsManager) {
     numberOfPlayers = allNames.length;
 
     if (messagesCount === 0) {
-        for (let i = 0; i < allNames.length; i++) {
+      console.log("FIRST TIMERRRRRRRRRRRRRRRR")
+      console.log(`ALL NAMES: ${allNames}`);
+      console.log(`allIsReady: ${allIsReady}`);
+      console.log(`characters: ${characters}`);
+
+        for (let i = 0; i < numberOfPlayers; i++) {
+          console.log(`${allNames[i]} != ${wsManager.playerName} `)
           if (allNames[i] != wsManager.playerName) {
+            console.log(`${characters[i]} != ${null} `)
             if (characters[i] != null) {
+              console.log(`O CO CHODZIII ${allNames[i]}, ${characters[i]}`)
               // if a player has a character create a message div
               createMessageDiv(allNames[i], characters[i], images[i]);
             } else {
@@ -95,6 +105,8 @@ export function setupWebSocketHandlers(wsManager) {
         }
         messagesCount++;
       } else {
+        console.log("Not the first time ;)")
+
         createOptionElement(allNames[allNames.length - 1]);
         createPlayerCircle(allNames[allNames.length - 1]);
       }
