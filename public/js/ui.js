@@ -62,8 +62,6 @@ function deleteOption(name) {
   }
 }
 
-
-
 export { createMessageDiv, createOptionElement, createPlayerCircle, changeCircleBorder, deleteOption, toggleDisplay };
 
 

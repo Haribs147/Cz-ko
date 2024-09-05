@@ -1,7 +1,6 @@
 export class WebSocketManager {
     constructor(url) {
       this.ws = new WebSocket(url);
-      console.log("ococho");
       this.roomCode = null;
       this.playerName = null;
       this.isHost = false;
