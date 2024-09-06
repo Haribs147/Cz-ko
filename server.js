@@ -4,14 +4,13 @@ import { WebSocketServer } from "ws";
 import path from "path";
 import ejs, { name } from "ejs";
 import bodyParser from "body-parser";
-import pg from "pg";
 import { randomBytes } from "crypto";
 import dotenv from "dotenv";
 import { type } from "os";
 import { measureMemory } from "vm";
 import axios from "axios";
 
-
+import {db, setupDatabase } from "./db.js";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -23,19 +22,13 @@ const searchEngineId = process.env.SEARCH_ENGINE_ID;
 // Create the Express app and HTTP server
 const app = express();
 const server = createServer(app);
-
 const __dirname = path.resolve();
-app.use(express.static(path.join(__dirname, "public")));
 
-// Setup the database
-const db = new pg.Client({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_DATABASE,
-  password: process.env.DB_PASSWORD,
-  port: parseInt(process.env.DB_PORT, 10),
-});
-db.connect();
+// Middleware setup
+app.use(express.static(path.join(__dirname, "public")));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 
 // Set up the WebSocket server
 const wss = new WebSocketServer({ server });
@@ -44,40 +37,6 @@ const wss = new WebSocketServer({ server });
 app.set("view engine", "ejs");
 app.set("views", path.join(path.resolve(), "views"));
 
-// bodyParser
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-async function setupDatabase() {
-  try {
-    // SQL commands to create tables
-    const createTablesQuery = `
-      CREATE TABLE IF NOT EXISTS game_room (
-        ID SERIAL PRIMARY KEY,
-        code VARCHAR(10) UNIQUE NOT NULL,
-        has_started INT
-      );
-
-      CREATE TABLE IF NOT EXISTS players (
-        ID SERIAL PRIMARY KEY,
-        name VARCHAR(15) NOT NULL,
-        character VARCHAR(20),
-        isReady INT,
-        url VARCHAR(250),
-        room_id INT REFERENCES game_room(ID)
-      );
-    `;
-
-    // Execute the SQL commands
-    await db.query(createTablesQuery);
-
-    console.log("Database setup complete.");
-  } catch (err) {
-    console.error("Error setting up the database:", err);
-  } finally {
-    // Close the connection
-  }
-}
 
 // Run the setup function
 setupDatabase();
