@@ -11,7 +11,8 @@ import { measureMemory } from "vm";
 import axios from "axios";
 
 import {db, setupDatabase } from "./db.js";
-import { fetchImageUrl } from "./apiService.js";
+import { setupWebSocketServer } from './webSocketService.js';
+
 // Load environment variables from .env file
 dotenv.config();
 
@@ -25,199 +26,15 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
-// Set up the WebSocket server
-const wss = new WebSocketServer({ server });
-
 // Set the view engine to EJS
 app.set("view engine", "ejs");
 app.set("views", path.join(path.resolve(), "views"));
 
-
 // Run the setup function
 setupDatabase();
 
-wss.on("connection", async function connection(ws) {
-  console.log("A new client Connected!");
-
-  ws.on("message", async function message(data) {
-    console.log(`received message: ${data}`);
-
-    var message = JSON.parse(data);
-    console.log(`received message oponent name: ${message.opponentName}`);
-    if (message.type === "get-characters-request") {
-      try {
-        // Fetch all characters and their respective player names in the room
-        const charactersResult = await db.query(
-          `SELECT players.name, players.character FROM players JOIN game_room ON players.room_id = game_room.ID WHERE game_room.code = $1 AND players.character IS NOT NULL`,
-          [message.roomCode]
-        );
-
-        // Send all characters and opponent names to the newly connected client
-        const sendCharacters = {
-          type: "existingCharacters",
-          characters: charactersResult.rows,
-          roomCode: message.roomCode,
-        };
-        console.log(`CHARACTERS SEND WUT ${charactersResult}`);
-        ws.send(JSON.stringify(sendCharacters));
-      } catch (err) {
-        console.log("Error sending existing characters:", err);
-        ws.send(
-          JSON.stringify({
-            message: "An error occurred while sending the existing characters",
-          })
-        );
-      }
-    }
-
-    if (message.type === "get-data-from-db") {
-      if (message.name && message.roomCode) {
-        ws.playerName = message.name; // Store playerName in ws object
-        ws.roomCode = message.roomCode; // Store roomCode in ws object
-      }
-      try {
-        // Get data from the db
-        const result = await db.query(
-          "SELECT players.name, players.character, players.isready, players.url FROM players JOIN game_room ON players.room_id = game_room.ID WHERE game_room.code = $1",
-          [message.roomCode]
-        );
-
-        const sendNames = {
-          type: "dataFromDb",
-          data: result.rows,
-          roomCode: message.roomCode,
-        };
-        console.log(sendNames);
-
-        // Send all of the players names back
-        wss.clients.forEach(function each(client) {
-          if (client.readyState === ws.OPEN) {
-            // Ensure that data is a string
-            client.send(JSON.stringify(sendNames));
-          }
-        });
-      } catch (err) {
-        console.log(err);
-        res.status(500).json({
-          message: "An error occurred while getting the names of the players",
-        });
-      }
-    } else if (message.type === "sendCharacters") {
-
-      message.url = await fetchImageUrl(message.character);
-      wss.clients.forEach(function each(client) {
-        if (client.readyState === ws.OPEN) {
-          // Ensure that data is a string
-          client.send(JSON.stringify(message));
-        }
-      });
-      const playerName = message.playerName;
-      const roomCode = message.roomCode;
-      const character = message.character;
-      const opponentName = message.opponentName;
-      //UPDATE THE DB
-      try {
-        
-        // Update the ready status of the player that clicked the button
-        await db.query(
-          `UPDATE players 
-           SET isReady = 1 
-           FROM game_room 
-           WHERE players.room_id = game_room.ID 
-           AND players.name = $1 
-           AND game_room.code = $2;`,
-          [playerName, roomCode]
-        );
-
-        // Update the character of the opponent of the player that clicked the button
-        await db.query(
-          `UPDATE players 
-           SET character = $1,
-               url = $2
-           FROM game_room 
-           WHERE players.room_id = game_room.ID 
-           AND players.name = $3
-           AND game_room.code = $4;`,
-          [character, message.url, opponentName, roomCode] //
-        );
-
-        console.log(
-          `Player ${playerName} in room ${roomCode} is now ready and the character for ${opponentName} is added to db.`
-        );
-      } catch (err) {
-        console.log(err);
-        res.status(500).json({
-          message: "An error occurred while updating the status of a player",
-        });
-      }  
-      
-
-    } else {
-      if (message.type === "start-game") {
-        await db.query(
-          `UPDATE game_room 
-           SET has_started = 1 
-           WHERE game_room.code = $1;`,
-          [message.roomCode]
-        );
-      }
-
-      wss.clients.forEach(function each(client) {
-        if (client !== ws && client.readyState === ws.OPEN) {
-          // Ensure that data is a string
-          client.send(JSON.stringify(message));
-        }
-      });
-    }
-  });
-
-  ws.on("close", async function () {
-    try {
-      if (ws.playerName && ws.roomCode) {
-        // Find the room ID associated with the room code
-        const roomResult = await db.query(
-          "SELECT ID FROM game_room WHERE code = $1",
-          [ws.roomCode]
-        );
-
-        if (roomResult.rows.length > 0) {
-          const roomId = roomResult.rows[0].id;
-
-          // Remove the player from the database
-          await db.query(
-            "DELETE FROM players WHERE name = $1 AND room_id = $2",
-            [ws.playerName, roomId]
-          );
-
-          console.log(
-            `Player ${ws.playerName} has been removed from room ${ws.roomCode}`
-          );
-
-          // Check if there are any players left in the room
-          const playerCountResult = await db.query(
-            "SELECT COUNT(*) FROM players WHERE room_id = $1",
-            [roomId]
-          );
-
-          // Convert to int
-          const playerCount = parseInt(playerCountResult.rows[0].count, 10);
-
-          // If no players are left, delete the room
-          if (playerCount === 0) {
-            await db.query("DELETE FROM game_room WHERE id = $1", [roomId]);
-
-            console.log(
-              `Room ${ws.roomCode} has been deleted because there are no players left.`
-            );
-          }
-        }
-      }
-    } catch (err) {
-      console.error("Error handling player disconnection:", err);
-    }
-  });
-});
+// Initialize WebSocket server
+setupWebSocketServer(server);
 
 app.get("/", (req, res) => {
   res.render("login");
