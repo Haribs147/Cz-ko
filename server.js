@@ -11,13 +11,9 @@ import { measureMemory } from "vm";
 import axios from "axios";
 
 import {db, setupDatabase } from "./db.js";
-
+import { fetchImageUrl } from "./apiService.js";
 // Load environment variables from .env file
 dotenv.config();
-
-//api search enginge
-const apiKey = process.env.API_KEY;
-const searchEngineId = process.env.SEARCH_ENGINE_ID;
 
 // Create the Express app and HTTP server
 const app = express();
@@ -108,25 +104,8 @@ wss.on("connection", async function connection(ws) {
         });
       }
     } else if (message.type === "sendCharacters") {
-      console.log(`ZARAZ OCHUJAM CO JEST message: ${message.character}`);
-      const query = message.character;
-      const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${searchEngineId}&searchType=image&q=${encodeURIComponent(query)}&num=1`;
-      try {
-        const response = await axios.get(url);
-        const items = response.data.items;
-        if (items && items.length > 0) {
-          const imageUrl = items[0].link;
-          message.url = imageUrl;
-        } else {
-          message.url = "url('/images/429-status-code.png')";
-          console.log("No images found");
-        }
-      } catch (error) {
-        message.url = "url('/images/429-status-code.png')";
-        console.log(message);
-        console.error("Couldn't download an image from api", error);
-      }
 
+      message.url = await fetchImageUrl(message.character);
       wss.clients.forEach(function each(client) {
         if (client.readyState === ws.OPEN) {
           // Ensure that data is a string
