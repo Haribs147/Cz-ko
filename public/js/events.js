@@ -71,19 +71,17 @@ export function setupWebSocketHandlers(wsManager) {
     // Handle the data received from the database
     console.log("GETTING DATA FROM THE DBBBBBBBB");
     const allNames = data.data.map(obj => obj.name);
-    
-
+    const allIsReady = data.data.map(obj => obj.isready);
+    const characters = data.data.map(obj => obj.character);
+    const images = data.data.map(obj => obj.url);
+    console.log(`ALL NAMES: ${allNames}`);
+    console.log(`allIsReady: ${allIsReady}`);
+    console.log(`characters: ${characters}`);
     if (messagesCount === 0) {
-      const allIsReady = data.data.map(obj => obj.isready);
-      const characters = data.data.map(obj => obj.character);
-      const images = data.data.map(obj => obj.url);
+      
 
       numberOfPlayers = allNames.length;
       console.log("FIRST TIMERRRRRRRRRRRRRRRR")
-      console.log(`ALL NAMES: ${allNames}`);
-      console.log(`allIsReady: ${allIsReady}`);
-      console.log(`characters: ${characters}`);
-
         for (let i = 0; i < numberOfPlayers; i++) {
           console.log(`${allNames[i]} != ${wsManager.playerName} `)
           if (allNames[i] != wsManager.playerName) {
