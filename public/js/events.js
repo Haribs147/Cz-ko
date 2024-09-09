@@ -75,47 +75,37 @@ export function setupWebSocketHandlers(wsManager) {
     const characters = data.data.map(obj => obj.character);
     const images = data.data.map(obj => obj.url);
     console.log(`ALL NAMES: ${allNames}`);
+    console.log(`ALL PLAYERS: ${allPlayers}`);
     console.log(`allIsReady: ${allIsReady}`);
     console.log(`characters: ${characters}`);
-    if (messagesCount === 0) {
-      
+    const notAddedPlayers = allNames
+      .map((name, index) => allPlayers.includes(name) ? null : { name, index })
+      .filter(entry => entry !== null);
+    allPlayers = allNames;
+    console.log(notAddedPlayers);
+    
+    numberOfPlayers = allNames.length;
+    const numberOfNotAddedPlayers = notAddedPlayers.length;
 
-      numberOfPlayers = allNames.length;
-      console.log("FIRST TIMERRRRRRRRRRRRRRRR")
-        for (let i = 0; i < numberOfPlayers; i++) {
-          console.log(`${allNames[i]} != ${wsManager.playerName} `)
-          if (allNames[i] != wsManager.playerName) {
-            console.log(`${characters[i]} != ${null} `)
-            if (characters[i] != null) {
-              console.log(`O CO CHODZIII ${allNames[i]}, ${characters[i]}`)
-              // if a player has a character create a message div
-              createMessageDiv(allNames[i], characters[i], images[i]);
-            } else {
-              //if he doesn't have a character create an option element for him
-              createOptionElement(allNames[i]);
-            }
-
-            createPlayerCircle(allNames[i]);
-
-            // if the player was already ready change the circle color to green
-            if (allIsReady[i] === 1) {
-              changeCircleBorder(allNames[i]);
-              readyPlayers++;
-            }
-          }
-        }
-        allPlayers = allNames;
-      messagesCount++;
-      } else {
-        console.log("Not the first time ;)")
-        const lastPlayerJoined = allNames[allNames.length - 1]
-        if(!allPlayers.includes(lastPlayerJoined)){
-          createOptionElement(lastPlayerJoined);
-          createPlayerCircle(lastPlayerJoined);
+    for (let i = 0; i < numberOfNotAddedPlayers; i++) {
+      if (notAddedPlayers[i].name != wsManager.playerName) {
+        if (characters[notAddedPlayers[i].index] != null) {
+          // if a player has a character create a message div
+          createMessageDiv(notAddedPlayers[i].name, characters[notAddedPlayers[i].index], images[notAddedPlayers[i].index]);
         } else {
-          allPlayers.push(lastPlayerJoined);
+          //if he doesn't have a character create an option element for him
+          createOptionElement(notAddedPlayers[i].name);
+        }
+
+        createPlayerCircle(notAddedPlayers[i].name);
+
+        // if the player was already ready change the circle color to green
+        if (allIsReady[notAddedPlayers[i].index] === 1) {
+          changeCircleBorder(notAddedPlayers[i].name);
+          readyPlayers++;
         }
       }
+    }
   });
 
   wsManager.on('sendCharacters', (data) => {
