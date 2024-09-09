@@ -7,6 +7,8 @@ let messagesCount = 0;
 let numberOfPlayers = 0;
 let readyPlayers = 0;
 let playersTable = [];
+var allPlayers = [];
+
 
 export function registerEventListeners(wsManager) {
   const startGameBtn = document.getElementById('start-game');
@@ -69,13 +71,14 @@ export function setupWebSocketHandlers(wsManager) {
     // Handle the data received from the database
     console.log("GETTING DATA FROM THE DBBBBBBBB");
     const allNames = data.data.map(obj => obj.name);
-    const allIsReady = data.data.map(obj => obj.isready);
-    const characters = data.data.map(obj => obj.character);
-    const images = data.data.map(obj => obj.url);
-
-    numberOfPlayers = allNames.length;
+    
 
     if (messagesCount === 0) {
+      const allIsReady = data.data.map(obj => obj.isready);
+      const characters = data.data.map(obj => obj.character);
+      const images = data.data.map(obj => obj.url);
+
+      numberOfPlayers = allNames.length;
       console.log("FIRST TIMERRRRRRRRRRRRRRRR")
       console.log(`ALL NAMES: ${allNames}`);
       console.log(`allIsReady: ${allIsReady}`);
@@ -103,12 +106,17 @@ export function setupWebSocketHandlers(wsManager) {
             }
           }
         }
-        messagesCount++;
+        allPlayers = allNames;
+      messagesCount++;
       } else {
         console.log("Not the first time ;)")
-
-        createOptionElement(allNames[allNames.length - 1]);
-        createPlayerCircle(allNames[allNames.length - 1]);
+        const lastPlayerJoined = allNames[allNames.length - 1]
+        if(!allPlayers.includes(lastPlayerJoined)){
+          createOptionElement(lastPlayerJoined);
+          createPlayerCircle(lastPlayerJoined);
+        } else {
+          allPlayers.push(lastPlayerJoined);
+        }
       }
   });
 

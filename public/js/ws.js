@@ -25,6 +25,7 @@ export class WebSocketManager {
     // Handle the WebSocket connection open event
     onOpen() {
       console.log('WebSocket connection opened');
+      console.log(`PRZESYŁAM GET DATA FROM THE DB ${this.roomCode} i ${this.playerName}`);
       this.sendMessage({
         roomCode: this.roomCode,
         type: 'get-data-from-db',
