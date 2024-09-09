@@ -68,6 +68,9 @@ export function registerEventListeners(wsManager) {
 
 export function setupWebSocketHandlers(wsManager) {
   wsManager.on('dataFromDb', (data) => {
+    if(wsManager.roomCode != data.roomCode){
+      return;
+    }
     // Handle the data received from the database
     console.log("GETTING DATA FROM THE DBBBBBBBB");
     const allNames = data.data.map(obj => obj.name);
@@ -83,7 +86,7 @@ export function setupWebSocketHandlers(wsManager) {
       .filter(entry => entry !== null);
     allPlayers = allNames;
     console.log(notAddedPlayers);
-    
+
     numberOfPlayers = allNames.length;
     const numberOfNotAddedPlayers = notAddedPlayers.length;
 
@@ -109,6 +112,9 @@ export function setupWebSocketHandlers(wsManager) {
   });
 
   wsManager.on('sendCharacters', (data) => {
+    if(wsManager.roomCode != data.roomCode){
+      return;
+    }
     if (wsManager.playerName === data.opponentName) {
       createMessageDiv(data.opponentName, '???????', data.url);
       changeCircleBorder(data.playerName);
@@ -122,9 +128,13 @@ export function setupWebSocketHandlers(wsManager) {
       readyPlayers++;
       deleteOption(data.opponentName);
     }
+    
   });
 
-  wsManager.on('start-game', () => {
+  wsManager.on('start-game', (data) => {
+    if(wsManager.roomCode != data.roomCode){
+      return;
+    }
     toggleDisplay('#start-game', 'none');
     toggleDisplay('#characters', 'flex');
     toggleDisplay('#players', 'none');
