@@ -4,9 +4,9 @@ import path from "path";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 
-import { setupDatabase } from "./db.js";
-import { setupWebSocketServer } from './webSocketService.js';
-import { renderLogin, handleNameSubmission } from "./routes.js";
+import { setupDatabase } from "./models/db.js";
+import { setupWebSocketServer } from './services/webSocketService.js';
+import { renderLogin, handleNameSubmission } from "./routes/routes.js";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -33,7 +33,6 @@ setupWebSocketServer(server);
 
 // Routes
 app.get("/", renderLogin);
-
 app.post("/submit-name", handleNameSubmission);
 
 server.listen(process.env.PORT || 3000, () => {

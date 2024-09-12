@@ -1,5 +1,5 @@
 import { randomBytes } from "crypto";
-import { db } from "./db.js";
+import { db } from "../models/db.js";
 
 var codeLength = 5;
 

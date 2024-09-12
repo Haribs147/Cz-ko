@@ -1,6 +1,5 @@
 import { WebSocketManager } from './ws.js';
 import { registerEventListeners, setupWebSocketHandlers } from './events.js';
-import { toggleDisplay } from './ui.js';
 
 // Load the variables from the index.ejs
 const playerName = window.playerName;

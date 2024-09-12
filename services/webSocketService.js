@@ -1,5 +1,5 @@
 import { WebSocketServer } from 'ws';
-import { db } from './db.js';
+import { db } from '../models/db.js';
 import { fetchImageUrl } from './apiService.js';
 
 export function setupWebSocketServer(server) {

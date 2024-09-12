@@ -1,6 +1,3 @@
-// events.js
-
-import { WebSocketManager } from './ws.js';
 import { toggleDisplay, createOptionElement, createPlayerCircle, changeCircleBorder, deleteOption, createMessageDiv } from './ui.js';
 
 let messagesCount = 0;
