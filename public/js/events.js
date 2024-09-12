@@ -67,6 +67,7 @@ export function registerEventListeners(wsManager) {
 }
 
 export function setupWebSocketHandlers(wsManager) {
+  
   wsManager.on('dataFromDb', (data) => {
     if(wsManager.roomCode != data.roomCode){
       return;
