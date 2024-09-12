@@ -5,7 +5,7 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 
 import { setupDatabase } from "./models/db.js";
-import { setupWebSocketServer } from './services/webSocketService.js';
+import { setupWebSocketServer } from "./services/webSocketService.js";
 import { renderLogin, handleNameSubmission } from "./routes/routes.js";
 
 // Load environment variables from .env file

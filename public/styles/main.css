@@ -87,9 +87,9 @@ button[type="submit"]:hover,
 }
 /* Container for the message divs */
 #characters {
-  display: none; 
-  flex-wrap: wrap; 
-  gap: 15px; 
+  display: none;
+  flex-wrap: wrap;
+  gap: 15px;
   margin-top: 15px;
   padding: 15px;
   background-color: #fff;

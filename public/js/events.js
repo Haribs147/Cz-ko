@@ -1,4 +1,11 @@
-import { toggleDisplay, createOptionElement, createPlayerCircle, changeCircleBorder, deleteOption, createMessageDiv } from './ui.js';
+import {
+  toggleDisplay,
+  createOptionElement,
+  createPlayerCircle,
+  changeCircleBorder,
+  deleteOption,
+  createMessageDiv,
+} from "./ui.js";
 
 let messagesCount = 0;
 let numberOfPlayers = 0;
@@ -6,30 +13,29 @@ let readyPlayers = 0;
 let playersTable = [];
 var allPlayers = [];
 
-
 export function registerEventListeners(wsManager) {
-  const startGameBtn = document.getElementById('start-game');
-  const characterSendBtn = document.getElementById('character-send');
-  const opponentSelect = document.getElementById('opponent-select');
-  const characterInput = document.getElementById('character-input');
+  const startGameBtn = document.getElementById("start-game");
+  const characterSendBtn = document.getElementById("character-send");
+  const opponentSelect = document.getElementById("opponent-select");
+  const characterInput = document.getElementById("character-input");
 
-  startGameBtn.addEventListener('click', () => {
+  startGameBtn.addEventListener("click", () => {
     if (readyPlayers === numberOfPlayers - 1) {
-      toggleDisplay('#start-game', 'none');
-      toggleDisplay('#characters', 'flex');
-      toggleDisplay('#players', 'none');
-      toggleDisplay('#room', 'none');
+      toggleDisplay("#start-game", "none");
+      toggleDisplay("#characters", "flex");
+      toggleDisplay("#players", "none");
+      toggleDisplay("#room", "none");
 
       wsManager.sendMessage({
         roomCode: wsManager.roomCode,
-        type: 'start-game',
+        type: "start-game",
       });
     } else {
-      window.alert('Please wait for all players to be ready.');
+      window.alert("Please wait for all players to be ready.");
     }
   });
 
-  characterSendBtn.addEventListener('click', () => {
+  characterSendBtn.addEventListener("click", () => {
     const opponentName = opponentSelect.value;
     const character = characterInput.value;
 
@@ -50,38 +56,39 @@ export function registerEventListeners(wsManager) {
       character: character,
       playerName: wsManager.playerName,
       roomCode: wsManager.roomCode,
-      type: 'sendCharacters',
+      type: "sendCharacters",
     };
 
-    toggleDisplay('.input-block', 'none');
+    toggleDisplay(".input-block", "none");
     if (wsManager.isHost == 1) {
-      toggleDisplay('#start-game', 'block');
+      toggleDisplay("#start-game", "block");
     } else {
-      toggleDisplay('#start-game-message', 'block');
+      toggleDisplay("#start-game-message", "block");
     }
     wsManager.sendMessage(sendCharacters);
   });
 }
 
 export function setupWebSocketHandlers(wsManager) {
-  
-  wsManager.on('dataFromDb', (data) => {
-    if(wsManager.roomCode != data.roomCode){
+  wsManager.on("dataFromDb", (data) => {
+    if (wsManager.roomCode != data.roomCode) {
       return;
     }
     // Handle the data received from the database
     console.log("GETTING DATA FROM THE DBBBBBBBB");
-    const allNames = data.data.map(obj => obj.name);
-    const allIsReady = data.data.map(obj => obj.isready);
-    const characters = data.data.map(obj => obj.character);
-    const images = data.data.map(obj => obj.url);
+    const allNames = data.data.map((obj) => obj.name);
+    const allIsReady = data.data.map((obj) => obj.isready);
+    const characters = data.data.map((obj) => obj.character);
+    const images = data.data.map((obj) => obj.url);
     console.log(`ALL NAMES: ${allNames}`);
     console.log(`ALL PLAYERS: ${allPlayers}`);
     console.log(`allIsReady: ${allIsReady}`);
     console.log(`characters: ${characters}`);
     const notAddedPlayers = allNames
-      .map((name, index) => allPlayers.includes(name) ? null : { name, index })
-      .filter(entry => entry !== null);
+      .map((name, index) =>
+        allPlayers.includes(name) ? null : { name, index }
+      )
+      .filter((entry) => entry !== null);
     allPlayers = allNames;
     console.log(notAddedPlayers);
 
@@ -92,7 +99,11 @@ export function setupWebSocketHandlers(wsManager) {
       if (notAddedPlayers[i].name != wsManager.playerName) {
         if (characters[notAddedPlayers[i].index] != null) {
           // if a player has a character create a message div
-          createMessageDiv(notAddedPlayers[i].name, characters[notAddedPlayers[i].index], images[notAddedPlayers[i].index]);
+          createMessageDiv(
+            notAddedPlayers[i].name,
+            characters[notAddedPlayers[i].index],
+            images[notAddedPlayers[i].index]
+          );
         } else {
           //if he doesn't have a character create an option element for him
           createOptionElement(notAddedPlayers[i].name);
@@ -109,12 +120,12 @@ export function setupWebSocketHandlers(wsManager) {
     }
   });
 
-  wsManager.on('sendCharacters', (data) => {
-    if(wsManager.roomCode != data.roomCode){
+  wsManager.on("sendCharacters", (data) => {
+    if (wsManager.roomCode != data.roomCode) {
       return;
     }
     if (wsManager.playerName === data.opponentName) {
-      createMessageDiv(data.opponentName, '???????', data.url);
+      createMessageDiv(data.opponentName, "???????", data.url);
       changeCircleBorder(data.playerName);
       readyPlayers++;
     } else if (wsManager.playerName === data.playerName) {
@@ -126,17 +137,16 @@ export function setupWebSocketHandlers(wsManager) {
       readyPlayers++;
       deleteOption(data.opponentName);
     }
-    
   });
 
-  wsManager.on('start-game', (data) => {
-    if(wsManager.roomCode != data.roomCode){
+  wsManager.on("start-game", (data) => {
+    if (wsManager.roomCode != data.roomCode) {
       return;
     }
-    toggleDisplay('#start-game', 'none');
-    toggleDisplay('#characters', 'flex');
-    toggleDisplay('#players', 'none');
-    toggleDisplay('#room', 'none');
-    toggleDisplay('#start-game-message', 'none');
+    toggleDisplay("#start-game", "none");
+    toggleDisplay("#characters", "flex");
+    toggleDisplay("#players", "none");
+    toggleDisplay("#room", "none");
+    toggleDisplay("#start-game-message", "none");
   });
 }

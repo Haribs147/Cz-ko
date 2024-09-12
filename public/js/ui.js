@@ -6,9 +6,9 @@ function createMessageDiv(oponentName, character, imgUrl) {
   const imageDiv = document.createElement("div");
   imageDiv.id = "message-image";
   if (character === "???????") {
-      imageDiv.style.backgroundImage = "url('/images/questionMarks.png')";
+    imageDiv.style.backgroundImage = "url('/images/questionMarks.png')";
   } else {
-      imageDiv.style.backgroundImage = `url(${imgUrl})`;
+    imageDiv.style.backgroundImage = `url(${imgUrl})`;
   }
   // Create the text paragraph
   const textParagraph = document.createElement("p");
@@ -31,7 +31,7 @@ function createOptionElement(oponentName) {
   option.innerHTML = `${oponentName}`;
   // Apend the option to the input
   const opponentSelect = document.getElementById("opponent-select");
-  opponentSelect.appendChild(option); 
+  opponentSelect.appendChild(option);
 }
 
 // Function to create and append a player's circle element
@@ -62,6 +62,11 @@ function deleteOption(name) {
   }
 }
 
-export { createMessageDiv, createOptionElement, createPlayerCircle, changeCircleBorder, deleteOption, toggleDisplay };
-
-
+export {
+  createMessageDiv,
+  createOptionElement,
+  createPlayerCircle,
+  changeCircleBorder,
+  deleteOption,
+  toggleDisplay,
+};
