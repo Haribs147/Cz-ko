@@ -25,8 +25,8 @@ async function setupDatabase() {
       );
       CREATE TABLE IF NOT EXISTS players (
         ID SERIAL PRIMARY KEY,
-        name VARCHAR(15) NOT NULL,
-        character VARCHAR(20),
+        name VARCHAR(25) NOT NULL,
+        character VARCHAR(50),
         isReady INT,
         url VARCHAR(250),
         room_id INT REFERENCES game_room(ID)
