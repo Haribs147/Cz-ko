@@ -13,7 +13,8 @@ export function setupWebSocketServer(server) {
       handleMessage(message, wss, ws);
     });
 
-    ws.on("close", async function () {
+    ws.on('close', function close(code, reason) {
+      console.log(`Client disconnected with code: ${code}, reason: ${reason}`);
       handleClientDisconnect(ws);
     });
   });
@@ -116,6 +117,7 @@ async function handleClientDisconnect(ws) {
       console.log(
         `Player ${ws.playerName} has been removed from room ${ws.roomCode}`
       );
+      
       // Check if there are any players left in the room
       const playerCountResult = await db.query(
         "SELECT COUNT(*) FROM players WHERE room_id = $1",
