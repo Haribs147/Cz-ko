@@ -8,6 +8,18 @@ export function setupWebSocketServer(server) {
   wss.on("connection", async function connection(ws) {
     console.log("A new client connected!");
 
+    // Set up the ping interval to check client connection
+    const pingInterval = setInterval(() => {
+      if (ws.readyState === ws.OPEN) {
+        ws.ping(); // Send a ping frame to the client
+        console.log("Sent ping to client");
+      }
+    }, 30000); // Ping every 30 seconds
+
+    ws.on('pong', function handlePong() {
+      console.log('Received pong from client');
+    });
+
     ws.on("message", async function message(data) {
       const message = JSON.parse(data);
       handleMessage(message, wss, ws);
